@@ -1,0 +1,70 @@
+---
+title: "Judy+Rosie+ZZ_Project"
+author: "Judy Zhu, Ruoxi Wu, Zhaoxin Zhang"
+date: "2024-11-11"
+output: html_document
+---
+# Install and load required packages
+```{r setup, include=FALSE}
+install.packages("httr")
+install.packages("jsonlite")
+library(httr)
+library(jsonlite)
+library(tidyverse)
+```
+# Define the base URL and parameters for OpenMeteo API
+
+```{r the base URL and parameters }
+base_url <- "https://archive-api.open-meteo.com/v1/era5" # Use archive API for historical data
+parameters <- list(
+  latitude = 31.9686,        # Latitude for Texas
+  longitude = -99.9018,      # Longitude for Texas
+  start_date = "2016-01-01", # Start date
+  end_date = "2023-12-31",   # End date
+  daily = "temperature_2m_max,temperature_2m_min",# Daily temperature data
+  timezone = "America/Chicago" # Specify the timezone
+)
+```
+
+
+```{r pressure, echo=FALSE}
+# Make the API request
+response <- GET(base_url, query = parameters)
+```
+
+```{r include=FALSE}
+# Check if the request was successful
+if (status_code(response) == 200) {
+# Parse the JSON response
+weather_data_Texas <- fromJSON(content(response, "text"))
+print(weather_data_Texas)
+} else {
+  print("Failed to fetch data")
+}
+```
+
+```{r}
+
+# Assuming weather_data_Texas contains the JSON data
+if (!is.null(weather_data_Texas$daily)) {
+  
+# Extract dates, max temperatures, and min temperatures
+dates <- weather_data_Texas$daily$time
+temp_max <- weather_data_Texas$daily$temperature_2m_max
+temp_min <- weather_data_Texas$daily$temperature_2m_min
+  
+# Combine into a data frame
+weather_Texas_df <- data.frame(
+  Date = as.Date(dates),  # Convert dates to Date format
+  Temperature_Max = temp_max,
+  Temperature_Min = temp_min
+  )
+  
+# Display the data frame
+print(weather_Texas_df)
+} else {print("No daily weather data available")
+}
+
+```
+
+
