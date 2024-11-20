@@ -75,6 +75,7 @@ library("readxl")
 
 
 ```{r}
+#Load 2016-2021 hourly Energy Load data
 Energy_2016 <- read_excel(here('Data/Raw/EnergyLoad_ercot/native_Load_2016.xlsx'))
 Energy_2017 <- read_excel(here('Data/Raw/EnergyLoad_ercot/native_Load_2017.xlsx'))
 Energy_2018 <- read_excel(here('Data/Raw/EnergyLoad_ercot/Native_Load_2018.xlsx'))
@@ -83,6 +84,11 @@ Energy_2020 <- read_excel(here('Data/Raw/EnergyLoad_ercot/Native_Load_2020.xlsx'
 Energy_2021 <- read_excel(here('Data/Raw/EnergyLoad_ercot/Native_Load_2021.xlsx'))
 Energy_2022 <- read_excel(here('Data/Raw/EnergyLoad_ercot/Native_Load_2022.xlsx'))
 Energy_2023 <- read_excel(here('Data/Raw/EnergyLoad_ercot/Native_Load_2023.xlsx'))
+```
+
+
+```{r}
+# Combine the 2016-2023 energy data, and wrangle to only date and total energy load "ERCOT"
 ```
 
 
