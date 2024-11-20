@@ -11,6 +11,9 @@ install.packages("jsonlite")
 library(httr)
 library(jsonlite)
 library(tidyverse)
+library(dplyr)
+library(lubridate)
+library(readr)
 ```
 # Define the base URL and parameters for OpenMeteo API
 
@@ -89,7 +92,148 @@ Energy_2023 <- read_excel(here('Data/Raw/EnergyLoad_ercot/Native_Load_2023.xlsx'
 
 ```{r}
 # Combine the 2016-2023 energy data, and wrangle to only date and total energy load "ERCOT"
+#Change each data's variable name to ensure consistency
+Energy_2017 <- rename(Energy_2017, Hour_End = "Hour Ending")
+Energy_2018 <- rename(Energy_2018, Hour_End = "HourEnding")
+Energy_2019 <- rename(Energy_2019, Hour_End = "HourEnding")
+Energy_2020 <- rename(Energy_2020, Hour_End = "HourEnding")
+Energy_2021 <- rename(Energy_2021, Hour_End = "Hour Ending")
+Energy_2022 <- rename(Energy_2022, Hour_End = "Hour Ending")
+Energy_2023 <- rename(Energy_2023, Hour_End = "Hour Ending")
 
+#Check the class of Energy_2016 Hour_End
+class(Energy_2016$Hour_End)
+
+#Convert Energy_2016 Hour_End to date 
+Energy_2016 <- Energy_2016 %>%
+  mutate(Date = as.Date(Hour_End))
+
+#Check the class of Energy_2017 Hour_End
+class(Energy_2017$Hour_End)
+
+# Convert character Hour_End to POSIXct format (date-time) first
+Energy_2017 <- Energy_2017 %>%
+  mutate(Hour_End = mdy_hm(Hour_End)) 
+
+#Then convert Energy_2017 Hour_End to date 
+Energy_2017 <- Energy_2017 %>%
+  mutate(Date = as.Date(Hour_End))
+
+#Check the class of Energy_2018 Hour_End
+class(Energy_2018$Hour_End)
+
+# Convert character Hour_End to POSIXct format (date-time)
+Energy_2018 <- Energy_2018 %>%
+  mutate(Hour_End = mdy_hm(Hour_End))
+
+#Then convert Energy_2018 Hour_End to date 
+Energy_2018 <- Energy_2018 %>%
+  mutate(Date = as.Date(Hour_End))
+
+#Check the class of Energy_2019 Hour_End
+class(Energy_2019$Hour_End)
+
+# Convert character Hour_End to POSIXct format (date-time)
+Energy_2019 <- Energy_2019 %>%
+  mutate(Hour_End = mdy_hm(Hour_End))
+
+#Then convert Energy_2019 Hour_End to date 
+Energy_2019 <- Energy_2019 %>%
+  mutate(Date = as.Date(Hour_End))
+
+#Check the class of Energy_2020 Hour_End
+class(Energy_2020$Hour_End)
+
+# Convert character Hour_End to POSIXct format (date-time)
+Energy_2020 <- Energy_2020 %>%
+  mutate(Hour_End = mdy_hm(Hour_End))
+
+#Then convert Energy_2020 Hour_End to date 
+Energy_2020 <- Energy_2020 %>%
+  mutate(Date = as.Date(Hour_End))
+
+#Check the class of Energy_2021 Hour_End
+class(Energy_2021$Hour_End)
+
+# Convert character Hour_End to POSIXct format (date-time)
+Energy_2021 <- Energy_2021 %>%
+  mutate(Hour_End = mdy_hm(Hour_End))
+
+#Then convert Energy_2021 Hour_End to date 
+Energy_2021 <- Energy_2021 %>%
+  mutate(Date = as.Date(Hour_End))
+
+#Check the class of Energy_2022 Hour_End
+class(Energy_2022$Hour_End)
+
+# Convert character Hour_End to POSIXct format (date-time)
+Energy_2022 <- Energy_2022 %>%
+  mutate(Hour_End = mdy_hm(Hour_End))
+
+#Then convert Energy_2022 Hour_End to date 
+Energy_2022 <- Energy_2022 %>%
+  mutate(Date = as.Date(Hour_End))
+
+#Check the class of Energy_2023 Hour_End
+class(Energy_2023$Hour_End)
+
+# Convert character Hour_End to POSIXct format (date-time)
+Energy_2023 <- Energy_2023 %>%
+  mutate(Hour_End = mdy_hm(Hour_End))
+
+#Then convert Energy_2023 Hour_End to date 
+Energy_2023 <- Energy_2023 %>%
+  mutate(Date = as.Date(Hour_End))
+
+#Keep only the Data and ERCOT
+Energy_2016 <- Energy_2016 %>%
+  select(Date, ERCOT)
+Energy_2017 <- Energy_2017 %>%
+  select(Date, ERCOT)
+Energy_2018 <- Energy_2018 %>%
+  select(Date, ERCOT)
+Energy_2019 <- Energy_2019 %>%
+  select(Date, ERCOT)
+Energy_2020 <- Energy_2020 %>%
+  select(Date, ERCOT)
+Energy_2021 <- Energy_2021 %>%
+  select(Date, ERCOT)
+Energy_2022 <- Energy_2022 %>%
+  select(Date, ERCOT)
+Energy_2023 <- Energy_2023 %>%
+  select(Date, ERCOT)
+
+#Combine all the dataset into one
+EnergyDemand_Daily <- bind_rows(
+  list(
+    Energy_2016 = Energy_2016,
+    Energy_2017 = Energy_2017,
+    Energy_2018 = Energy_2018,
+    Energy_2019 = Energy_2019,
+    Energy_2020 = Energy_2020,
+    Energy_2021 = Energy_2021,
+    Energy_2022 = Energy_2022,
+    Energy_2023 = Energy_2023
+  ),
+  .id = "Data"
+)
+
+EnergyDemand_Daily <- EnergyDemand_Daily %>%
+  select(Date, ERCOT)
+
+sum(is.na(EnergyDemand_Daily))
+EnergyDemand_Daily <- EnergyDemand_Daily %>% filter(!is.na(Date))  # Remove rows with NA
+
+EnergyDemand_Daily <- EnergyDemand_Daily %>% filter(!is.na(ERCOT))
+
+sum(is.na(EnergyDemand_Daily))
+
+
+EnergyDemand_Daily <- EnergyDemand_Daily %>%
+  group_by(Date) %>%
+  summarise(Daily_ERCOT = sum(ERCOT, na.rm = TRUE))
+            
 ```
+
 
 
