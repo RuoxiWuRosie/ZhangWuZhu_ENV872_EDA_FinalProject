@@ -62,7 +62,7 @@ weather_Texas_df <- data.frame(
   
 # Display the data frame
 print(weather_Texas_df)
-} else {print("No daily weather data available")
+} else {print("No daily weather data available") huin
 }
 
 ```
