@@ -89,6 +89,7 @@ Energy_2023 <- read_excel(here('Data/Raw/EnergyLoad_ercot/Native_Load_2023.xlsx'
 
 ```{r}
 # Combine the 2016-2023 energy data, and wrangle to only date and total energy load "ERCOT"
+
 ```
 
 
