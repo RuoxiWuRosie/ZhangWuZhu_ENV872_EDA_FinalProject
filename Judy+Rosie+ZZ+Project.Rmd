@@ -62,9 +62,27 @@ weather_Texas_df <- data.frame(
   
 # Display the data frame
 print(weather_Texas_df)
-} else {print("No daily weather data available") huin
+} else {print("No daily weather data available")
 }
 
+```
+```{r}
+library(here)
+here()
+install.packages("readxl")
+library("readxl")
+```
+
+
+```{r}
+Energy_2016 <- read_excel(here('Data/Raw/EnergyLoad_ercot/native_Load_2016.xlsx'))
+Energy_2017 <- read_excel(here('Data/Raw/EnergyLoad_ercot/native_Load_2017.xlsx'))
+Energy_2018 <- read_excel(here('Data/Raw/EnergyLoad_ercot/Native_Load_2018.xlsx'))
+Energy_2019 <- read_excel(here('Data/Raw/EnergyLoad_ercot/Native_Load_2019.xlsx'))
+Energy_2020 <- read_excel(here('Data/Raw/EnergyLoad_ercot/Native_Load_2020.xlsx'))
+Energy_2021 <- read_excel(here('Data/Raw/EnergyLoad_ercot/Native_Load_2021.xlsx'))
+Energy_2022 <- read_excel(here('Data/Raw/EnergyLoad_ercot/Native_Load_2022.xlsx'))
+Energy_2023 <- read_excel(here('Data/Raw/EnergyLoad_ercot/Native_Load_2023.xlsx'))
 ```
 
 
