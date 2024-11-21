@@ -204,7 +204,7 @@ Energy_2023 <- Energy_2023 %>%
   select(Date, ERCOT)
 
 #Combine all the dataset into one
-EnergyDemand_Daily <- bind_rows(
+EnergyLoad_Daily <- bind_rows(
   list(
     Energy_2016 = Energy_2016,
     Energy_2017 = Energy_2017,
@@ -218,22 +218,52 @@ EnergyDemand_Daily <- bind_rows(
   .id = "Data"
 )
 
-EnergyDemand_Daily <- EnergyDemand_Daily %>%
+EnergyLoad_Daily <- EnergyLoad_Daily %>%
   select(Date, ERCOT)
 
-sum(is.na(EnergyDemand_Daily))
-EnergyDemand_Daily <- EnergyDemand_Daily %>% filter(!is.na(Date))  # Remove rows with NA
+sum(is.na(EnergyLoad_Daily)) #See how many NAs 
 
-EnergyDemand_Daily <- EnergyDemand_Daily %>% filter(!is.na(ERCOT))
+# Remove rows with NA
+EnergyLoad_Daily <- EnergyLoad_Daily %>% filter(!is.na(Date))  
 
-sum(is.na(EnergyDemand_Daily))
+EnergyLoad_Daily <- EnergyLoad_Daily %>% filter(!is.na(ERCOT))
 
+sum(is.na(EnergyLoad_Daily)) #No NAs
 
-EnergyDemand_Daily <- EnergyDemand_Daily %>%
+#Turn the hourly data to daily data
+EnergyLoad_Daily <- EnergyLoad_Daily %>%
   group_by(Date) %>%
   summarise(Daily_ERCOT = sum(ERCOT, na.rm = TRUE))
-            
+
+#Rename the columns
+colnames(EnergyLoad_Daily) <- c("Date", "ERCOT(MW)")
+
 ```
 
+```{r}
+#Import Electricity Price Data
+ElectricityPrice_Monthly <- read.csv("Data/Raw/EnergyPrice/SeriesExport-11-20-2024-10-13-55.csv",
+                                     stringsAsFactors =TRUE)
+
+#Select data from 2016-01 to 2023-12
+ElectricityPrice_Monthly <- ElectricityPrice_Monthly %>%
+  filter(row_number() >= 15) %>%
+  filter(row_number() <= 96) %>%
+  select(Series.Key, ELEC.PRICE.TX.ALL.M)
+
+#Rename the variables
+colnames(ElectricityPrice_Monthly) <- c("Date", "Price(cent/KWh)")
+
+#Convert to Date format
+ElectricityPrice_Monthly <- ElectricityPrice_Monthly %>%
+  mutate(Date = ym(Date))
+
+#Convert to numeric format
+ElectricityPrice_Monthly$`Price(cent/KWh)` <- as.numeric(as.character(ElectricityPrice_Monthly$`Price(cent/KWh)`))
+
+#Rearrange the Date
+ElectricityPrice_Monthly <- ElectricityPrice_Monthly %>%
+  arrange(Date)
+```
 
 
