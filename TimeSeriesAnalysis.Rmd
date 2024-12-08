@@ -1,0 +1,40 @@
+```{r}
+# Set up r
+library(tidyverse)
+library(lubridate)
+install.packages("trend")
+library(trend)
+install.packages("zoo")
+library(zoo)
+install.packages("Kendall")
+library(Kendall)
+install.packages("tseries")
+library(tseries)
+library(ggplot2)
+# Set theme
+mytheme <- theme_classic(base_size = 14) +
+  theme(axis.text = element_text(color = "black"), 
+        legend.position = "right")
+theme_set(mytheme)
+```
+
+
+```{r}
+# Import data
+ElectricityPrice_Monthly <-
+  read.csv("./Data/Processed/ElectricityPrice_Monthly.csv")
+EnergyLoad_Daily <-
+  read.csv("./Data/Processed/EnergyLoad_Daily.csv")
+Temperature_Daily <-
+  read.csv("./Data/Processed/Temperature_MaxMin_Daily.csv")
+```
+
+Combine daily temperature and energy load data for linear interpolation
+```{r}
+Temp_Load <- left_join (Temperature_Daily, EnergyLoad_Daily, by="Date")
+```
+
+Plot daily min temperature and energy load
+```{r}
+```
+
