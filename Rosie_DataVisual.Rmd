@@ -7,8 +7,56 @@ output: html_document
 # How temperature, energy load, and electricity price changed and correlated over year 2016-2023
 # Prediction of number of extreme cold days in 2024-2025 and its required energy load based on different scenarios
 
+```{r setup, include=FALSE}
+#install.packages("httr")
+#install.packages("jsonlite")
+library(httr)
+library(jsonlite)
+library(tidyverse)
+library(dplyr)
+library(lubridate)
+library(readr)
+library(here)
+```
+
 ```{r}
 # This visualizes the temperature change overtime (year 2016-2023)
+# Load necessary libraries
+library(ggplot2)
+temp_data <- read.csv("Data/Processed/Temperature_MaxMin_Daily.csv")
+
+# Ensure the date column is in Date format
+temp_data$Date <- as.Date(temp_data$Date)
+
+# Aggregate the data to monthly averages
+monthly_data <- temp_data %>%
+  mutate(month = format(Date, "%Y-%m")) %>% # Extract year-month
+  group_by(month) %>%
+  summarise(
+    avg_max_temp = mean(Temperature_Max, na.rm = TRUE),
+    avg_min_temp = mean(Temperature_Min, na.rm = TRUE)
+  ) %>%
+  ungroup()
+
+# Convert the month column to Date for plotting
+# I assigned 01 to Days in the Dates, but it's actually average done earlier
+monthly_data$month <- as.Date(paste0(monthly_data$month, "-01"))
+
+# Plot the trends of max and min temperatures
+print(
+  ggplot(monthly_data, aes(x = month)) +
+  geom_line(aes(y = avg_max_temp, color = "Max Temperature")) +
+  geom_line(aes(y = avg_min_temp, color = "Min Temperature")) +
+  labs(
+    title = "Monthly Average Temperature Trends (2016-2023)",
+    x = "Date",
+    y = "Temperature (°C)",
+    color = "Legend"
+  ) +
+  theme_minimal())
+
+```
+```{r}
 
 ```
 
