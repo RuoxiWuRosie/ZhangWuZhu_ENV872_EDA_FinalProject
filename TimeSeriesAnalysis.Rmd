@@ -31,10 +31,48 @@ Temperature_Daily <-
 
 Combine daily temperature and energy load data for linear interpolation
 ```{r}
-Temp_Load <- left_join (Temperature_Daily, EnergyLoad_Daily, by="Date")
+#Temp_Load <- left_join (Temperature_Daily, EnergyLoad_Daily, by="Date")
 ```
 
-Plot daily min temperature and energy load
+Generate three time series objects based on imported data
 ```{r}
+electricity.monthly.ts <- ts(ElectricityPrice_Monthly$Price.cent.KWh.,
+                   start=c(2016,01), end = c(2023,12),
+                   frequency=12) 
+energyload.daily.ts <- ts(EnergyLoad_Daily$ERCOT.MW.,
+                   start=c(2016,01,01), end = c(2023,12,31),
+                   frequency=365)
+temp.min.daily.ts <- ts(Temperature_Daily$Temperature_Min,
+                   start=c(2016,01,01), end = c(2023,12,31),
+                   frequency=365)
+```
+
+Decompose the time series objects and plot them.
+```{r}
+energyload.daily.decomp <- stl(energyload.daily.ts,s.window = "periodic")
+temp.min.daily.decomp <- stl(temp.min.daily.ts,s.window = "periodic")
+electricity.monthly.decomp <- stl(electricity.monthly.ts,s.window = "periodic")
+
+temp.ts <- plot(temp.min.daily.decomp)
+energy.ts <- plot(energyload.daily.decomp)
+electricity.ts <- plot(electricity.monthly.decomp)
+ 
+```
+
+Do a seasonal Mann Kendall test to evaluate trends in the three datasets
+```{r}
+electricity.monthly.trend <- Kendall::SeasonalMannKendall(electricity.monthly.ts)
+energyload.daily.trend <- Kendall::SeasonalMannKendall(energyload.daily.ts)
+temp.min.daily.trend <- Kendall::SeasonalMannKendall(temp.min.daily.ts)
+
+summary(electricity.monthly.trend)
+
+summary(energyload.daily.trend)
+
+summary(temp.min.daily.trend)
+```
+
+```{r}
+view(temp.ts)
 ```
 
