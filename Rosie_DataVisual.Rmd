@@ -1,0 +1,14 @@
+---
+title: "Data-Visualization"
+author: "Rosie Wu"
+date: "2024-11-11"
+output: html_document
+---
+# How temperature, energy load, and electricity price changed and correlated over year 2016-2023
+# Prediction of number of extreme cold days in 2024-2025 and its required energy load based on different scenarios
+
+```{r}
+# This visualizes the temperature change overtime (year 2016-2023)
+
+```
+
