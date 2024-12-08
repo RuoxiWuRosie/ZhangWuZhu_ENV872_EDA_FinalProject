@@ -266,4 +266,14 @@ ElectricityPrice_Monthly <- ElectricityPrice_Monthly %>%
   arrange(Date)
 ```
 
+```{r}
+#Export processed data into Processed folder
+write.csv(EnergyLoad_Daily, row.names = FALSE, 
+          file ="./Data/Processed/EnergyLoad_Daily.csv") 
+write.csv(ElectricityPrice_Monthly, row.names = FALSE, 
+          file ="./Data/Processed/ElectricityPrice_Monthly.csv") 
+write.csv(weather_Texas_df, row.names = FALSE, 
+          file ="./Data/Processed/Temperature_MaxMin_Daily.csv") 
+
+```
 
