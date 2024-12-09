@@ -73,7 +73,7 @@ winter_data <- subset(extreme_cold_load_price, month_number %in% c("12", "01", "
 After we have the data with number of extreme cold days in a month, monthly energy load and monthly mean electricity price, we can use a linear model analysis to see if the number of cold days impact the monthly load and price.
 ```{r}
 # H0: The number of days in a month has no impacts on the amount of monthly energy load
-# H2: The number of days in a month has impacts on the amount of monthly energy load
+# Ha: The number of days in a month has impacts on the amount of monthly energy load
 
 # Number of days and load
 ModelLoad <- lm(MW ~ days, data = winter_data)
@@ -102,7 +102,7 @@ We then test if the number of extremely cold days has impact the monthly electri
 
 ```{r}
 # H0: The number of extremely cold days in a month has no impacts on the monthly electricity price
-# H2: The number of extremely cold days in a month has impacts on the monthly electricity price
+# Ha: The number of extremely cold days in a month has impacts on the monthly electricity price
 
 # Number of days and load
 ModelPrice<- lm(Price.cent.KWh. ~ days, data = winter_data)
