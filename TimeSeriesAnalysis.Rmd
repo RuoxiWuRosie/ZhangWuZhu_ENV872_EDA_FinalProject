@@ -54,16 +54,23 @@ electricity.ts <- plot(electricity.monthly.decomp)
  
 ```
 
-Do a seasonal Mann Kendall test to evaluate trends in the three datasets
+Do a seasonal Mann Kendall test to evaluate trends in the three datasets.
 ```{r}
 electricity.monthly.trend <- Kendall::SeasonalMannKendall(electricity.monthly.ts)
 energyload.daily.trend <- Kendall::SeasonalMannKendall(energyload.daily.ts)
 temp.min.daily.trend <- Kendall::SeasonalMannKendall(temp.min.daily.ts)
 
 summary(electricity.monthly.trend)
-
 summary(energyload.daily.trend)
-
 summary(temp.min.daily.trend)
 ```
-The seasonal Mann Kendall tests showed that electricity price and energy load has been statistically increasing throughout 2016 to 2023; however, min temperature has been decreasing, but not statistically significant.
+The seasonal Mann Kendall tests results showed that electricity price and energy load has been statistically increasing throughout 2016 to 2023 (positive score with p-value < 0.05); however, minimal temperature has been decreasing, but not statistically significant (p-value =0.72513 > 0.05) . We use seasonal Mann Kendall test because seasonal pattern is significant in these three datasets. Since electricity price is influenced by multiple factors, such as market dynamics and policies, we decide to run a Mann Kendall test on detrended electricity data.
+```{r}
+electricity.monthly.Components <- 
+  as.data.frame(electricity.monthly.decomp$time.series[,])
+electricity.monthly.detrended <- 
+  ElectricityPrice_Monthly$Price.cent.KWh. - electricity.monthly.Components$seasonal
+
+electricity.monthly.detrended.result <- MannKendall(electricity.monthly.detrended)
+summary(electricity.monthly.detrended.result)
+```
