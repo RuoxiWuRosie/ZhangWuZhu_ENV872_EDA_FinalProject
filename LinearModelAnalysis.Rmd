@@ -1,0 +1,114 @@
+---
+title: "LinearModelAnalysis"
+author: "Zhaoxin Zhang"
+date: "2024-12-09"
+output: html_document
+---
+
+```{r}
+library(dplyr)
+install.packages("lubridate")
+library(lubridate)
+library(ggplot2)
+# Import Data
+ElectricityPrice_Monthly <-
+  read.csv("./Data/Processed/ElectricityPrice_Monthly.csv")
+EnergyLoad_Daily <-
+  read.csv("./Data/Processed/EnergyLoad_Daily.csv")
+Temperature_Daily <-
+  read.csv("./Data/Processed/Temperature_MaxMin_Daily.csv")
+
+#Convert the Date to data format
+ElectricityPrice_Monthly$Date <- as.Date(ElectricityPrice_Monthly$Date)
+
+EnergyLoad_Daily$Date <- as.Date(EnergyLoad_Daily$Date)
+
+Temperature_Daily$Date <- as.Date(Temperature_Daily$Date)
+
+```
+
+We want to see how may extreme cold temperature impact energy load and electricity price. We want to see how many days are extremely cold in each month, and if the number of days is related to the energy load and price. 
+
+We first define what is "extremely cold". According to the National Weather Service, in the southern U. S., "extreme cold" are defined as near freezing temperatures. Thus, We define that if a day's minimum temperature is lower than 0, that day will be defined as "extremely cold".
+
+```{r setup, include=FALSE}
+#Build a new column "Extreme_Cold"
+Temperature_Daily <- Temperature_Daily %>%
+  mutate(Extreme_Cold = ifelse(Temperature_Min <= 0, 1, 0))
+
+# Aggregate the number of extreme cold days by month
+extreme_cold_monthly <- Temperature_Daily %>%
+  mutate(month = floor_date(Date, "month")) %>%  # Extract the month
+  group_by(month) %>%  # Group by month
+  summarise(`days` = sum(Extreme_Cold))
+
+# Aggregate the load data to monthly daily averages
+monthly_load <- EnergyLoad_Daily %>%
+  mutate(month = format(Date, "%Y-%m")) %>% # Extract year-month
+  group_by(month) %>%
+  summarise(
+    MW = mean(`ERCOT.MW.`, na.rm = TRUE)
+  ) %>%
+  ungroup()
+
+#Combined the monthly load, electricity price and extreme cold days data for the linear model. 
+
+monthly_load$month <- as.Date(paste0(monthly_load$month, "-01"))
+
+ElectricityPrice_Monthly <- ElectricityPrice_Monthly %>%
+  rename(month=Date)
+
+extreme_cold_load_price <- monthly_load %>%
+  left_join(extreme_cold_monthly, by = "month", na.rm==T) %>%
+  left_join(ElectricityPrice_Monthly, by = "month", na.rm==T)
+```
+
+Since we interested on extremely cold days, we will only keep the data for winter. In this way, we avoid the extremely hot days' data affects our result. 
+```{r}
+# Keep winter data only.
+extreme_cold_load_price$month_number <- format(extreme_cold_load_price$month, "%m")
+winter_data <- subset(extreme_cold_load_price, month_number %in% c("12", "01", "02"))
+```
+
+After we have the data with number of extreme cold days in a month, monthly energy load and monthly mean electricity price, we can use a linear model analysis to see if the number of cold days impact the monthly load and price.
+```{r}
+# H0: The number of days in a month has no impacts on the amount of monthly energy load
+# H2: The number of days in a month has impacts on the amount of monthly energy load
+
+# Number of days and load
+ModelLoad <- lm(MW ~ days, data = winter_data)
+
+# Summary of the model
+summary(ModelLoad)
+```
+
+The p-value if 0.00438, which is smaller than the significance level 0.05, so we reject the null hypothesis that number of extreme cold days has no impact on energy load. There is strong evidence that days has a significant effect on energy load. When there is no extreme cold day, the energy load is estimated to be 873,984 MW. For every one additional extreme cold day, 
+the energy load increases by 11,920 MW on average.
+
+```{r}
+# Plot the data with the linear regression line
+ggplot(data = winter_data, aes(x = days, y = MW)) +
+  geom_point(color = "blue", size = 2) + # Scatter plot for points
+  geom_smooth(method = "lm", color = "red", se = TRUE) + # Linear regression line with confidence interval
+  labs(
+    title = "Linear Model: MW vs Days",
+    x = "Number of Days",
+    y = "Energy Load (MW)"
+  ) +
+  ylim(800000, 1200000)
+```
+
+We then test if the number of extremely cold days has impact the monthly electricity price. 
+
+```{r}
+# H0: The number of days in a month has no impacts on the monthly electricity price
+# H2: The number of days in a month has impacts on the monthly electricity price
+
+# Number of days and load
+ModelPrice<- lm(Price.cent.KWh. ~ days, data = winter_data)
+
+# Summary of the model
+summary(ModelPrice)
+```
+The p-value if 0.229, which is bigger than the significance level 0.05, so we fail to reject the null hypothesis that number of extreme cold days has no impact on electricity price. There is no strong evidence that days has a significant effect on electricity price.
+

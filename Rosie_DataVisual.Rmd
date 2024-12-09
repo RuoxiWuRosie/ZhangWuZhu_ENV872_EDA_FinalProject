@@ -1,0 +1,164 @@
+---
+title: "Data-Visualization"
+author: "Rosie Wu"
+date: "2024-11-11"
+output: html_document
+---
+# How temperature, energy load, and electricity price changed and correlated over year 2016-2023
+# Prediction of number of extreme cold days in 2024-2025 and its required energy load based on different scenarios
+
+```{r setup, include=FALSE}
+#install.packages("httr")
+#install.packages("jsonlite")
+library(httr)
+library(jsonlite)
+library(tidyverse)
+library(dplyr)
+library(lubridate)
+library(readr)
+library(here)
+```
+# Data import and wrangling for correlation and visualization
+
+```{r}
+# This visualizes the temperature change overtime (year 2016-2023)
+# Load necessary libraries
+library(ggplot2)
+temp_data <- read.csv("Data/Processed/Temperature_MaxMin_Daily.csv")
+
+# Ensure the date column is in Date format
+temp_data$Date <- as.Date(temp_data$Date)
+
+# Aggregate the data to monthly averages
+min_temp_data <- temp_data %>%
+  mutate(month = format(Date, "%Y-%m")) %>% # Extract year-month
+  group_by(month) %>%
+  summarise(
+    avg_min_temp = mean(Temperature_Min, na.rm = TRUE)
+  ) %>%
+  ungroup()
+
+# Convert the month column to Date for plotting
+# I assigned 01 to Days in the Dates, but it's actually average done earlier
+min_temp_data$month <- as.Date(paste0(min_temp_data$month, "-01"))
+
+# Ensure the data is numeric
+min_temp_data$avg_min_temp <- as.numeric(as.character(min_temp_data$avg_min_temp))
+
+```
+
+
+```{r}
+# get Energy Load Data
+EnergyLoad_Daily <- read_csv("Data/Processed/EnergyLoad_Daily.csv")
+
+# Ensure the date column is in Date format
+EnergyLoad_Daily$Date <- as.Date(EnergyLoad_Daily$Date)
+
+# Aggregate the data to monthly averages
+monthly_load <- EnergyLoad_Daily %>%
+  mutate(month = format(Date, "%Y-%m")) %>% # Extract year-month
+  group_by(month) %>%
+  summarise(
+    MW = mean(`ERCOT(MW)`, na.rm = TRUE)
+  ) %>%
+  ungroup()
+
+# Convert the month column to Date for plotting
+# I assigned 01 to Days in the Dates, but it's actually average done earlier
+monthly_load$month <- as.Date(paste0(monthly_load$month, "-01"))
+
+# Ensure the data is numeric
+monthly_load$MW <- as.numeric(as.character(monthly_load$MW))
+
+```
+
+```{r}
+# import data for electricity price 
+library(readr)
+ElectricityPrice_Monthly <- read_csv("Data/Processed/ElectricityPrice_Monthly.csv")
+
+# the Price data is in cent/kwh, so I need to convert the Energy load (MW) previously to KW
+# Add a new column to energy_load_data for kW
+monthly_load$load_kw <- monthly_load$MW * 1000
+
+```
+
+```{r}
+# rename the column name to combine the datasets
+ElectricityPrice_Monthly <- ElectricityPrice_Monthly %>%
+  rename(month = Date)
+
+# Merge the datasets by the 'month' column (ensure all have the same 'month' column)
+combined_data <- min_temp_data %>%
+  left_join(monthly_load, by = "month") %>%
+  left_join(ElectricityPrice_Monthly, by = "month")
+
+# rename the column name of price in combined datasets since it had paranthesis and difficult to work with
+combined_data <- combined_data %>% rename(Price = 'Price(cent/KWh)')
+
+```
+
+# Correlation and Plot the correlation between energy load and electricity price
+
+```{r}
+# Calculate the correlation between energy load (in kW) and electricity price (in cents/kWh)
+correlation <- cor(combined_data$load_kw, combined_data$Price, use = "complete.obs")
+
+# Print the correlation coefficient
+print(paste("Correlation coefficient:", correlation))
+
+# Plot the correlation between energy load and electricity price
+ggplot(combined_data, aes(x = load_kw, y = Price)) +
+  geom_point(color = "blue", size = 2) +  # Scatter plot
+  geom_smooth(method = "lm", color = "red", linetype = "dashed") +  # Add regression line
+  labs(
+    title = "Correlation Between Energy Load and Electricity Price",
+    x = "Energy Load (kW)",
+    y = "Electricity Price (cents/kWh)"
+  ) +
+  theme_minimal()
+
+```
+
+# Correlation and Plot the correlation between Min Temperature and Energy Load
+
+```{r}
+# Calculate the correlation between energy load (in kW) and Monthly Avg temperature
+correlation_2 <- cor(combined_data$avg_min_temp, combined_data$load_kw, use = "complete.obs")
+
+# Print the correlation coefficient
+print(paste("Correlation coefficient:", correlation_2))
+
+# Plot the correlation between energy load and electricity price
+ggplot(combined_data, aes(x = avg_min_temp, y = load_kw)) +
+  geom_point(color = "blue", size = 2) +  # Scatter plot
+  geom_smooth(method = "lm", color = "red", linetype = "dashed") +  # Add regression line
+  labs(
+    title = "Correlation Between Monthly Minimum Temperature & Energy Load",
+    x = "Monthly Average Min Temperature",
+    y = "Energy Load (kW)"
+  ) +
+  theme_minimal()
+
+```
+
+# Correlation and Plot the correlation between Min Temperature and Electricity Price
+
+```{r}
+# Calculate the correlation between monthly min temperature & electricity price 
+correlation_3 <- cor(combined_data$avg_min_temp, combined_data$Price, use = "complete.obs")
+print(paste("Correlation coefficient:", correlation_3))
+
+ggplot(combined_data, aes(x = avg_min_temp, y = Price)) +
+  geom_point(color = "blue", size = 2) +  # Scatter plot
+  geom_smooth(method = "lm", color = "red", linetype = "dashed") +  # Add regression line
+  labs(
+    title = "Correlation Between Energy Load and Electricity Price",
+    x = "Monthly Average Min Temperature",
+    y = "Electricity Price (cents/kWh)"
+  ) +
+  theme_minimal()
+
+```
+

@@ -29,11 +29,6 @@ Temperature_Daily <-
   read.csv("./Data/Processed/Temperature_MaxMin_Daily.csv")
 ```
 
-Combine daily temperature and energy load data for linear interpolation
-```{r}
-#Temp_Load <- left_join (Temperature_Daily, EnergyLoad_Daily, by="Date")
-```
-
 Generate three time series objects based on imported data
 ```{r}
 electricity.monthly.ts <- ts(ElectricityPrice_Monthly$Price.cent.KWh.,
@@ -71,11 +66,4 @@ summary(energyload.daily.trend)
 
 summary(temp.min.daily.trend)
 ```
-
-```{r}
-view(temp.ts)
-```
-```{r}
-here()
-```
-
+The seasonal Mann Kendall tests showed that electricity price and energy load has been statistically increasing throughout 2016 to 2023; however, min temperature has been decreasing, but not statistically significant.
