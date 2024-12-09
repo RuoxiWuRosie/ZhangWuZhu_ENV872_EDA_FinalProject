@@ -1,3 +1,8 @@
+---
+output:
+  html_document: default
+  pdf_document: default
+---
 # <Repository Title>
 <Instructions: copy and paste this template into your project README file (found in the parent folder of the repository). Fill in relevant information as requested.>
 
@@ -9,13 +14,35 @@
 
 <describe the purpose of this repository, the information it contains, and any relevant analysis goals. What, why, where, when, how?>
 
+The 2021 Texas winter storm was a severe and unprecedented cold weather event that caused widespread power outages and significant damage across the state due to a combination of extreme temperatures (as low as -2°F/-19°C ) and infrastructure failures. 
+
+Our team wishes to study the trend of occurrence of extreme low temperature events in Texas, and how does these events correlate with the local energy demand and electricity price. Using historical data, we hope to predict the grid demand for future extreme cold days for preparedness, increasing local resilience and energy security in winter.
+
+The main research questions we are trying to answer are:
+1. How did the frequency of extreme cold days changed in the past 8 years in Texas? How did local energy demand and electricity price changed in these extreme cold days?
+2. 
+
 ## Investigators
 
 <name(s), affiliation(s), contact information, roles (if applicable)>
 
-## Keywords
+Judy Hua Zhu
+hua.zhu@duke.edu
 
+Rosie Wu
+rosie.wu@duke.edu
+
+Zhaoxin Zhang
+zhaoxin.zhang@duke.edu 
+
+Master of Environmental Management
+Duke Nicholas School of Environment
+
+## Keywords
 <add relevant keywords here>
+
+Extreme temperature, cold climate, electricity load, electricty price
+
 
 ## Database Information
 
@@ -25,10 +52,14 @@
 ## Folder structure, file formats, and naming conventions 
 
 <describe the folders contained in the repository, including what type of files they contain>
-
 <describe the formats of files for the various purposes contained in the repository>
-
 <describe your file naming conventions>
+
+- We have 3 general folders: Data, Data Wrangling & Analysis, Report
+- Data folder: contains csv data in 2 categories. Processed data: extracted and wrangled. Raw: data extracted directly from online searching or scrapping
+- Data Wrangling & Analysis folder: contains rmd files for data wrangling (which output were exported to Processed Data folder) and analysis process (Time Series, Linear Modeling, Visualizations)
+- Report folder: Our final project report rmd file and html output is located in this folder.
+
 
 ## Metadata
 
