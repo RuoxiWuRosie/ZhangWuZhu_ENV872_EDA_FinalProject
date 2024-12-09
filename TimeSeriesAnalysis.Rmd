@@ -2,13 +2,13 @@
 # Set up r
 library(tidyverse)
 library(lubridate)
-install.packages("trend")
+#install.packages("trend")
 library(trend)
-install.packages("zoo")
+#install.packages("zoo")
 library(zoo)
-install.packages("Kendall")
+#install.packages("Kendall")
 library(Kendall)
-install.packages("tseries")
+#install.packages("tseries")
 library(tseries)
 library(ggplot2)
 # Set theme
@@ -74,3 +74,24 @@ electricity.monthly.detrended <-
 electricity.monthly.detrended.result <- MannKendall(electricity.monthly.detrended)
 summary(electricity.monthly.detrended.result)
 ```
+
+Detrended Mann Kendall test's result further supports that electricity price has been statistically significantly increasing through the past 8 years.
+
+Lastly, we hope to predict future minimal temperature and energy load needed based on historical data. We will use Autoregressive Integrated Moving Average (ARIMA) package to do a prilimary simple forcasting.
+```{r}
+library(forecast)
+#energy.prediction <- auto.arima(energyload.daily.ts,seasonal = TRUE)
+summary(energy.prediction)
+# Check residuals
+checkresiduals(electricity.prediction)
+# Forecast
+min.temp.forecasted <- forecast(electricity.prediction, h = 12)
+plot(min.temp.forecasted)
+summary(min.temp.forecasted)
+```
+
+
+
+
+
+
