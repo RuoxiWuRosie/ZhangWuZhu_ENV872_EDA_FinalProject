@@ -101,8 +101,8 @@ ggplot(data = winter_data, aes(x = days, y = MW)) +
 We then test if the number of extremely cold days has impact the monthly electricity price. 
 
 ```{r}
-# H0: The number of days in a month has no impacts on the monthly electricity price
-# H2: The number of days in a month has impacts on the monthly electricity price
+# H0: The number of extremely cold days in a month has no impacts on the monthly electricity price
+# H2: The number of extremely cold days in a month has impacts on the monthly electricity price
 
 # Number of days and load
 ModelPrice<- lm(Price.cent.KWh. ~ days, data = winter_data)
