@@ -30,7 +30,7 @@ temp_data <- read.csv("Data/Processed/Temperature_MaxMin_Daily.csv")
 temp_data$Date <- as.Date(temp_data$Date)
 
 # Aggregate the data to monthly averages
-monthly_min_temp <- temp_data %>%
+min_temp_data <- temp_data %>%
   mutate(month = format(Date, "%Y-%m")) %>% # Extract year-month
   group_by(month) %>%
   summarise(
@@ -51,7 +51,6 @@ min_temp_data$avg_min_temp <- as.numeric(as.character(min_temp_data$avg_min_temp
 ```{r}
 # get Energy Load Data
 EnergyLoad_Daily <- read_csv("Data/Processed/EnergyLoad_Daily.csv")
-View(EnergyLoad_Daily)
 
 # Ensure the date column is in Date format
 EnergyLoad_Daily$Date <- as.Date(EnergyLoad_Daily$Date)
@@ -78,7 +77,6 @@ monthly_load$MW <- as.numeric(as.character(monthly_load$MW))
 # import data for electricity price 
 library(readr)
 ElectricityPrice_Monthly <- read_csv("Data/Processed/ElectricityPrice_Monthly.csv")
-View(ElectricityPrice_Monthly)
 
 # the Price data is in cent/kwh, so I need to convert the Energy load (MW) previously to KW
 # Add a new column to energy_load_data for kW
