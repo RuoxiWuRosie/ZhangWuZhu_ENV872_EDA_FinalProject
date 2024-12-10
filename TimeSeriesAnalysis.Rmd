@@ -1,3 +1,10 @@
+---
+title: "Time Series Analysis"
+author: "Judy Zhu"
+date: "2024-12-11"
+output: html_document
+---
+  
 ```{r}
 # Set up r
 library(tidyverse)

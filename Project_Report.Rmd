@@ -1,3 +1,10 @@
+---
+title: "Forecasting Energy Demand for Extreme Low Temperature Events in Texas"
+author: "Judy Zhu, Ruoxi Wu, Zhaoxin Zhang"
+date: "2024-12-10"
+output: html_document
+---
+
 \newpage
 \tableofcontents 
 \newpage
@@ -23,29 +30,33 @@ library(lubridate)
 library(readr)
 library(here)
 library(ggplot2)
+library(zoo)
+library(tseries)
+library(Kendall)
+library(trend)
 
 # Load datasets
 # This visualizes the temperature change overtime (year 2016-2023)
 temp_data <- read.csv("Data/Processed/Temperature_MaxMin_Daily.csv")
 
-# Ensure the date column is in Date format
-temp_data$Date <- as.Date(temp_data$Date)
+# Import daily energy load data in 2016-2023
+EnergyLoad_Daily <-
+  read.csv("./Data/Processed/EnergyLoad_Daily.csv")
+
+# Import monthly electricity price data in 2016-2023
+ElectricityPrice_Monthly <- read_csv("Data/Processed/ElectricityPrice_Monthly.csv")
 
 # import monthly electricity load data
 Monthly_Load <- read.csv("./Data/Processed/Monthly_Load.csv")
 Monthly_Load$month <- as.Date(paste0(Monthly_Load$month, "-01"), format = "%Y-%m-%d")
 
-# import data for electricity price 
-ElectricityPrice_Monthly <- read_csv("Data/Processed/ElectricityPrice_Monthly.csv")
-
-# the Price data is in cent/kwh, so I need to convert the Energy load (MW) previously to KW
+# the Price data is in cent/kWh, so we convert the Energy load (MW) previously to kW
 # Add a new column to energy_load_data for kW
-Monthly_Load$load_kw <- Monthly_Load$MW * 1000
+Monthly_Load$load_kW <- Monthly_Load$MW * 1000
 
 # rename the column name to combine the datasets
 ElectricityPrice_Monthly <- ElectricityPrice_Monthly %>%
   rename(month = Date)
-
 
 #Build a new column "Extreme_Cold"
 temp_data <- temp_data %>%
@@ -77,14 +88,14 @@ combined_data <- combined_data[-nrow(combined_data), ]
 # 2 Research Questions:
  1. How did the frequency of extreme cold days changed in the past 8 years in Texas? How did local energy demand and electricity price changed in these extreme cold days?
 
- 2. If following the past trend, what is the range of extreme low temperature days in 2024/2025? What is the predicted energy demand for preparing corresponding days?
+ 2. If following the past trend, how much energy will be demanded for preparing extreme cold days in 2024 and 2025?
 
 
 
 \newpage
 
 # 3 Dataset Information
-The data used for this analysis is from different sources. Historical records of temperature can be found in the archive API https://archive-api.open-meteo.com/v1/era5. Given the information on Texas's latitude and longitude and the start and end dates from January 2016 to December 2023, the API archive could provide data on daily temperature in Texas from 2016 to 2023. The API gave the maximum and minimum temperatures in Texas from 2016 to 2023 in degrees Celsius. The Electric Reliability Council of Texas (ERCOT) gave hourly energy load data in Texas, from year 2016 to 2023, in MW. The U.S. Energy Information Administration (EIA) contained monthly average electricity price data from 2001 to 2024, and the unit was cent/kWh. The data for daily electricity prices was unavailable. All of the data from the three sources used in this analysis had a date column, which could ensure the time series analysis's viability. The data had continuous data on daily temperature, hourly load, and monthly price, which would be used for both time series and linear model analysis. The data and sources are listed below (Table 3.1).
+Data used for this analysis is from different sources. Historical records of temperature were found in the archive API https://archive-api.open-meteo.com/v1/era5. Given the information on Texas's latitude and longitude and the start and end dates from January 2016 to December 2023, the API archive could provide data on daily temperature in Texas from 2016 to 2023. The API gave the maximum and minimum temperatures in Texas from 2016 to 2023 in degrees Celsius. The Electric Reliability Council of Texas (ERCOT) gave hourly energy load data in Texas, from year 2016 to 2023, in MW. The U.S. Energy Information Administration (EIA) contained monthly average electricity price data from 2001 to 2024, and the unit was cent/kWh. The data for daily electricity prices was unavailable. All of the data from the three sources used in this analysis had a date column, which could ensure the time series analysis's viability. The data had continuous data on daily temperature, hourly load, and monthly price, which would be used for both time series and linear model analysis. The data and sources are listed below (Table 3.1).
 
 Table 3.1: Table summarizing the data sources
   
@@ -106,7 +117,11 @@ All the data's Date columns were converted to "date" format, and all other colum
 
 # 5 Exploratory Analysis 
 
-# Below is a column graph of all of the months' # of days below 0 degree
+## 5.1 Extreme cold days in Texas from 2016-2023
+> According to the visualization of the # of days <0 degree celsius in each month in Texas from 2016-01 to 2023-12, number of below-freezing days in January 2021 and 2022 are the highest. Also, the time range (number of months) for extremely cold days are highest in 2021, which align with the news of power breakouts in 2021 in Texas due to the abnormal cold-front.
+
+> Below is a column graph of all of the months' # of days below 0 degree
+
 ```{r}
 ggplot(combined_data, aes(x = month, y = Extreme_Cold_days)) +
   geom_col(fill = "steelblue") +
@@ -118,9 +133,11 @@ ggplot(combined_data, aes(x = month, y = Extreme_Cold_days)) +
   scale_x_date(date_labels = "%Y-%m", date_breaks = "6 months") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
-> According to the visualization of the # of days <0 degree celsius in each month in Texas from 2016-01 to 2023-12, number of below-freezing days in 2021-01 and 2022-01 are the highest. Also, the time range (number of months) for extremely cold days are highest in 2021, which align with the news of power breakouts in 2021 in Texas due to the abnormal cold-front.
 
-# Below is a line of graph for Monthly load from 2016-2023
+## 5.2 Energy Load in Texas from 2016-2023
+> According to the line graph from 2016 to 2023, the energy load is generally increasing overtime with great pattern of seasonality, and it has spiked in mid-2023. General trend will be explained later in time series analysis.
+
+> Below is a line of graph for Monthly load from 2016-2023
 
 ```{r}
 ggplot(combined_data, aes(x = month, y = MW)) +
@@ -132,11 +149,13 @@ ggplot(combined_data, aes(x = month, y = MW)) +
     y = "Energy Load (MW)")
 
 ```
-> According to the line graph from 2016 to 2023, the electricity load is generally increasing overtime with great pattern of seasonality, and it has spiked in mid-2023. 
 
 
+## 5.3 Monthly electricity price in Texas from 2016-2023
+> The electricity price in Texas is increasing overtime from 2016-2023 with slight but less consistent seasonality. However, the electricity price spike around early 2021, which could be a reflection from the large-scale blackout in the winter in Texas. The state-wide grid and local distribution systems were struggling to recover to cater the demand from the local residents and business during and right after the cold-front.
 
-# Below is a line graph for monthly electricity price from 2016-2023
+> Below is a line graph for monthly electricity price from 2016-2023
+
 ```{r}
 ggplot(combined_data, aes(x = month, y = Price)) +
   geom_line(color = "blue", size = 1) +  # Line graph
@@ -148,19 +167,16 @@ ggplot(combined_data, aes(x = month, y = Price)) +
 
 ```
 
-> The electricity price in Texas is increasing overtime from 2016-2023 with slight but less consistent seasonality. However, the electricity price spike around early 2021, which could be a reflection from the large-scale blackout in the winter in Texas. The state-wide grid and local distribution systems were struggling to recover to cater the demand from the local residents and business during and right after the cold-front.
-
-
 
 \newpage
 
-# Analysis
+# 6 Analysis
 
 
 
-## Question 1: <insert specific question here and add additional subsections for additional questions below, if needed>
+## Question 1: How did the frequency of extreme cold days changed in the past 8 years in Texas? How did local energy demand and electricity price changed in these extreme cold days?
 
-## Question 2: 
+## Question 2: If following the past trend, how much energy will be demanded for preparing extreme cold days in 2024 and 2025?
 
 
 
