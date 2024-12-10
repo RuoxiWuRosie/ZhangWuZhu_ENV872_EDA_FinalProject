@@ -1,0 +1,176 @@
+\newpage
+\tableofcontents 
+\newpage
+\listoftables 
+\newpage
+\listoffigures 
+\newpage
+
+```{r setup, include=FALSE}
+# Set your working directory
+# Load your packages
+# Load your datasets
+
+# Set your ggplot theme
+
+
+# Load your packages
+library(httr)
+library(jsonlite)
+library(tidyverse)
+library(dplyr)
+library(lubridate)
+library(readr)
+library(here)
+library(ggplot2)
+
+# Load datasets
+# This visualizes the temperature change overtime (year 2016-2023)
+temp_data <- read.csv("Data/Processed/Temperature_MaxMin_Daily.csv")
+
+# Ensure the date column is in Date format
+temp_data$Date <- as.Date(temp_data$Date)
+
+# import monthly electricity load data
+Monthly_Load <- read.csv("./Data/Processed/Monthly_Load.csv")
+Monthly_Load$month <- as.Date(paste0(Monthly_Load$month, "-01"), format = "%Y-%m-%d")
+
+# import data for electricity price 
+ElectricityPrice_Monthly <- read_csv("Data/Processed/ElectricityPrice_Monthly.csv")
+
+# the Price data is in cent/kwh, so I need to convert the Energy load (MW) previously to KW
+# Add a new column to energy_load_data for kW
+Monthly_Load$load_kw <- Monthly_Load$MW * 1000
+
+# rename the column name to combine the datasets
+ElectricityPrice_Monthly <- ElectricityPrice_Monthly %>%
+  rename(month = Date)
+
+
+#Build a new column "Extreme_Cold"
+temp_data <- temp_data %>%
+  mutate(Extreme_Cold = ifelse(Temperature_Min <= 0, 1, 0))
+
+# Aggregate the number of extreme cold days by month
+extreme_cold_monthly <- temp_data %>%
+  mutate(month = floor_date(Date, "month")) %>%  # Extract the month
+  group_by(month) %>%  # Group by month
+  summarise(`Extreme_Cold_days` = sum(Extreme_Cold))
+
+# combine all datasets together
+combined_data <- Monthly_Load %>%
+  left_join(extreme_cold_monthly, by = "month", na.rm==T) %>%
+  left_join(ElectricityPrice_Monthly, by = "month", na.rm==T)
+
+# rename the column name of price in combined datasets since it had paranthesis and difficult to work with
+combined_data <- combined_data %>% rename(Price = 'Price(cent/KWh)')
+
+# the last row of dataset is 2024-01, but the data is still not collected completely, so eliminate this row to ensure accuracy
+combined_data <- combined_data[-nrow(combined_data), ]
+```
+
+
+# 1 Rationale and Research Questions -- Background
+
+
+
+# 2 Research Questions:
+ 1. How did the frequency of extreme cold days changed in the past 8 years in Texas? How did local energy demand and electricity price changed in these extreme cold days?
+
+ 2. If following the past trend, what is the range of extreme low temperature days in 2024/2025? What is the predicted energy demand for preparing corresponding days?
+
+
+
+\newpage
+
+# 3 Dataset Information
+The data used for this analysis is from different sources. Historical records of temperature can be found in the archive API https://archive-api.open-meteo.com/v1/era5. Given the information on Texas's latitude and longitude and the start and end dates from January 2016 to December 2023, the API archive could provide data on daily temperature in Texas from 2016 to 2023. The API gave the maximum and minimum temperatures in Texas from 2016 to 2023 in degrees Celsius. The Electric Reliability Council of Texas (ERCOT) gave hourly energy load data in Texas, from year 2016 to 2023, in MW. The U.S. Energy Information Administration (EIA) contained monthly average electricity price data from 2001 to 2024, and the unit was cent/kWh. The data for daily electricity prices was unavailable. All of the data from the three sources used in this analysis had a date column, which could ensure the time series analysis's viability. The data had continuous data on daily temperature, hourly load, and monthly price, which would be used for both time series and linear model analysis. The data and sources are listed below (Table 3.1).
+
+Table 3.1: Table summarizing the data sources
+  
+Data Sources
+-------------:|:-------------
+API  | Texas Daily Max and Min Temperature
+ERCOT | Texas Hourly Energy Load
+EIA | Texas Monthly Electricity Price
+
+\newpage
+
+# 4 Data Wrangling
+The API data contained three columns: date, daily max temperature, and daily min temperature. The date column was in "character" format and thus needed to be converted to "date" format using the as.Date() code for the following analysis. The raw ERCOT data contained hourly energy load data, but the analysis needed to be done at the daily level of energy load. Thus, the ERCOT's data was aggregated and converted from hourly data to daily data. The ERCOT data had 10 columns: Date and Hourly Energy Load in MW via 9 different regions or standards. The analysis chose to use the ERCOT energy load, selecting only two columns from the data: Date and ERCOT. The official website did not provide aggregated data from 2016 to 2023. Instead, it provided each year's data. The data from 2016 to 2023 was aggregated in one data called "EnergyLoad_Daily." This data would be used for analysis and visualization. The daily data w a s
+was then aggregated into monthly data for later analysis. The EIA's data gave 8 variables, including the date and electricity price via different end-use. This analysis would use the average electricity price for all sectors, so only two columns were selected: Date and Average Electricity Price among All Sectors. The data included information from 2001 to 2024, while the analysis only needed data from 2016 to 2023. Therefore, a code filtered data from row 15 to row 96, selecting date only from 2016 to 2023. 
+
+All the data's Date columns were converted to "date" format, and all other columns were converted to "numeric" format to make the latter analyses available. The raw data was uploaded to the "Data/Raw" file, and the processed datasets: monthly electricity price, daily energy load, monthly energy load, and daily temperature, were uploaded to the "Data/Processed" file in CSV format for the visualization, linear model analysis, and time series analysis. 
+
+\newpage
+
+# 5 Exploratory Analysis 
+
+# Below is a column graph of all of the months' # of days below 0 degree
+```{r}
+ggplot(combined_data, aes(x = month, y = Extreme_Cold_days)) +
+  geom_col(fill = "steelblue") +
+  labs(
+    title = "Number of Days Below 0°C Per Month (2016–2023)",
+    x = "Month",
+    y = "Number of Days"
+  ) +
+  scale_x_date(date_labels = "%Y-%m", date_breaks = "6 months") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+> According to the visualization of the # of days <0 degree celsius in each month in Texas from 2016-01 to 2023-12, number of below-freezing days in 2021-01 and 2022-01 are the highest. Also, the time range (number of months) for extremely cold days are highest in 2021, which align with the news of power breakouts in 2021 in Texas due to the abnormal cold-front.
+
+# Below is a line of graph for Monthly load from 2016-2023
+
+```{r}
+ggplot(combined_data, aes(x = month, y = MW)) +
+  geom_line(color = "blue", size = 1) +  # Line graph
+  geom_smooth(method = "lm", color = "red", linetype = "dashed") +  # Add regression line
+  labs(
+    title = "Monthly Energy Load in MW in Texas in 2016-2023",
+    x = "Month",
+    y = "Energy Load (MW)")
+
+```
+> According to the line graph from 2016 to 2023, the electricity load is generally increasing overtime with great pattern of seasonality, and it has spiked in mid-2023. 
+
+
+
+# Below is a line graph for monthly electricity price from 2016-2023
+```{r}
+ggplot(combined_data, aes(x = month, y = Price)) +
+  geom_line(color = "blue", size = 1) +  # Line graph
+  geom_smooth(method = "lm", color = "red", linetype = "dashed") +  # Add regression line
+  labs(
+    title = "Monthly Average Electricity Price in Texas 2016-2023",
+    x = "Month",
+    y = "Electricity Price (Cent/KWh)")
+
+```
+
+> The electricity price in Texas is increasing overtime from 2016-2023 with slight but less consistent seasonality. However, the electricity price spike around early 2021, which could be a reflection from the large-scale blackout in the winter in Texas. The state-wide grid and local distribution systems were struggling to recover to cater the demand from the local residents and business during and right after the cold-front.
+
+
+
+\newpage
+
+# Analysis
+
+
+
+## Question 1: <insert specific question here and add additional subsections for additional questions below, if needed>
+
+## Question 2: 
+
+
+
+
+\newpage
+
+# Summary and Conclusions
+
+
+\newpage
+
+# References
+<add references here if relevant, otherwise delete this section> 

@@ -17,87 +17,107 @@ library(dplyr)
 library(lubridate)
 library(readr)
 library(here)
+library(ggplot2)
 ```
 # Data import and wrangling for correlation and visualization
 
 ```{r}
 # This visualizes the temperature change overtime (year 2016-2023)
-# Load necessary libraries
-library(ggplot2)
 temp_data <- read.csv("Data/Processed/Temperature_MaxMin_Daily.csv")
 
 # Ensure the date column is in Date format
 temp_data$Date <- as.Date(temp_data$Date)
 
-# Aggregate the data to monthly averages
-min_temp_data <- temp_data %>%
-  mutate(month = format(Date, "%Y-%m")) %>% # Extract year-month
-  group_by(month) %>%
-  summarise(
-    avg_min_temp = mean(Temperature_Min, na.rm = TRUE)
-  ) %>%
-  ungroup()
+# import monthly electricity load data
+Monthly_Load <- read.csv("./Data/Processed/Monthly_Load.csv")
+Monthly_Load$month <- as.Date(paste0(Monthly_Load$month, "-01"), format = "%Y-%m-%d")
 
-# Convert the month column to Date for plotting
-# I assigned 01 to Days in the Dates, but it's actually average done earlier
-min_temp_data$month <- as.Date(paste0(min_temp_data$month, "-01"))
-
-# Ensure the data is numeric
-min_temp_data$avg_min_temp <- as.numeric(as.character(min_temp_data$avg_min_temp))
-
-```
-
-
-```{r}
-# get Energy Load Data
-EnergyLoad_Daily <- read_csv("Data/Processed/EnergyLoad_Daily.csv")
-
-# Ensure the date column is in Date format
-EnergyLoad_Daily$Date <- as.Date(EnergyLoad_Daily$Date)
-
-# Aggregate the data to monthly averages
-monthly_load <- EnergyLoad_Daily %>%
-  mutate(month = format(Date, "%Y-%m")) %>% # Extract year-month
-  group_by(month) %>%
-  summarise(
-    MW = mean(`ERCOT(MW)`, na.rm = TRUE)
-  ) %>%
-  ungroup()
-
-# Convert the month column to Date for plotting
-# I assigned 01 to Days in the Dates, but it's actually average done earlier
-monthly_load$month <- as.Date(paste0(monthly_load$month, "-01"))
-
-# Ensure the data is numeric
-monthly_load$MW <- as.numeric(as.character(monthly_load$MW))
-
-```
-
-```{r}
 # import data for electricity price 
 library(readr)
 ElectricityPrice_Monthly <- read_csv("Data/Processed/ElectricityPrice_Monthly.csv")
 
 # the Price data is in cent/kwh, so I need to convert the Energy load (MW) previously to KW
 # Add a new column to energy_load_data for kW
-monthly_load$load_kw <- monthly_load$MW * 1000
+Monthly_Load$load_kw <- Monthly_Load$MW * 1000
 
-```
-
-```{r}
 # rename the column name to combine the datasets
 ElectricityPrice_Monthly <- ElectricityPrice_Monthly %>%
   rename(month = Date)
+```
 
-# Merge the datasets by the 'month' column (ensure all have the same 'month' column)
-combined_data <- min_temp_data %>%
-  left_join(monthly_load, by = "month") %>%
-  left_join(ElectricityPrice_Monthly, by = "month")
+# Since we changed our Temperature monthly to # of days in extreme low temperature (<=0 celsius), so now we add a new column for this # of cold days, and combine an updated dataset.
+
+```{r}
+#Build a new column "Extreme_Cold"
+temp_data <- temp_data %>%
+  mutate(Extreme_Cold = ifelse(Temperature_Min <= 0, 1, 0))
+
+# Aggregate the number of extreme cold days by month
+extreme_cold_monthly <- temp_data %>%
+  mutate(month = floor_date(Date, "month")) %>%  # Extract the month
+  group_by(month) %>%  # Group by month
+  summarise(`Extreme_Cold_days` = sum(Extreme_Cold))
+
+# combine all datasets together
+combined_data <- Monthly_Load %>%
+  left_join(extreme_cold_monthly, by = "month", na.rm==T) %>%
+  left_join(ElectricityPrice_Monthly, by = "month", na.rm==T)
 
 # rename the column name of price in combined datasets since it had paranthesis and difficult to work with
 combined_data <- combined_data %>% rename(Price = 'Price(cent/KWh)')
 
+# the last row of dataset is 2024-01, but the data is still not collected completely, so eliminate this row to ensure accuracy
+combined_data <- combined_data[-nrow(combined_data), ]
 ```
+
+
+# Exploratory visualizations for each variable to be shown before all of the correlations and Time Series analysis.
+
+# Below is a column graph of all of the months' # of days below 0 degree
+```{r}
+ggplot(combined_data, aes(x = month, y = Extreme_Cold_days)) +
+  geom_col(fill = "steelblue") +
+  labs(
+    title = "Number of Days Below 0°C Per Month (2016–2023)",
+    x = "Month",
+    y = "Number of Days"
+  ) +
+  scale_x_date(date_labels = "%Y-%m", date_breaks = "6 months") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+> According to the visualization of the # of days <0 degree celsius in each month in Texas from 2016-01 to 2023-12, number of below-freezing days in 2021-01 and 2022-01 are the highest. Also, the time range (number of months) for extremely cold days are highest in 2021, which align with the news of power breakouts in 2021 in Texas due to the abnormal cold-front.
+
+
+# Below is a line of graph for Monthly load from 2016-2023
+
+```{r}
+ggplot(combined_data, aes(x = month, y = MW)) +
+  geom_line(color = "blue", size = 1) +  # Line graph
+  geom_smooth(method = "lm", color = "red", linetype = "dashed") +  # Add regression line
+  labs(
+    title = "Monthly Energy Load in MW in Texas in 2016-2023",
+    x = "Month",
+    y = "Energy Load (MW)")
+
+```
+> According to the line graph from 2016 to 2023, the electricity load is generally increasing overtime with great pattern of seasonality, and it has spiked in mid-2023. 
+
+
+
+# Below is a line graph for monthly electricity price from 2016-2023
+```{r}
+ggplot(combined_data, aes(x = month, y = Price)) +
+  geom_line(color = "blue", size = 1) +  # Line graph
+  geom_smooth(method = "lm", color = "red", linetype = "dashed") +  # Add regression line
+  labs(
+    title = "Monthly Average Electricity Price in Texas 2016-2023",
+    x = "Month",
+    y = "Electricity Price (Cent/KWh)")
+
+```
+> The electricity price in Texas is increasing overtime from 2016-2023 with slight but less consistent seasonality. However, the electricity price spike around early 2021, which could be a reflection from the large-scale blackout in the winter in Texas. The state-wide grid and local distribution systems were struggling to recover to cater the demand from the local residents and business during and right after the cold-front.
+
+
 
 # Correlation and Plot the correlation between energy load and electricity price
 
@@ -161,4 +181,7 @@ ggplot(combined_data, aes(x = avg_min_temp, y = Price)) +
   theme_minimal()
 
 ```
+
+
+
 
