@@ -25,8 +25,11 @@ ElectricityPrice_Monthly <-
   read.csv("./Data/Processed/ElectricityPrice_Monthly.csv")
 EnergyLoad_Daily <-
   read.csv("./Data/Processed/EnergyLoad_Daily.csv")
+EnergyLoad_DailyAvg <-
+  read.csv("./Data/Processed/Monthly_Load.csv")
 Temperature_Daily <-
   read.csv("./Data/Processed/Temperature_MaxMin_Daily.csv")
+
 ```
 
 Generate three time series objects based on imported data
@@ -37,21 +40,27 @@ electricity.monthly.ts <- ts(ElectricityPrice_Monthly$Price.cent.KWh.,
 energyload.daily.ts <- ts(EnergyLoad_Daily$ERCOT.MW.,
                    start=c(2016,01,01), end = c(2023,12,31),
                    frequency=365)
+energyload.daily.avg.ts <- ts(EnergyLoad_DailyAvg$MW,
+                   start=c(2016,01), end = c(2023,12),
+                   frequency=12)
 temp.min.daily.ts <- ts(Temperature_Daily$Temperature_Min,
                    start=c(2016,01,01), end = c(2023,12,31),
                    frequency=365)
+
 ```
 
 Decompose the time series objects and plot them.
 ```{r}
 energyload.daily.decomp <- stl(energyload.daily.ts,s.window = "periodic")
+energyload.daily.avg.decomp <- stl(energyload.daily.avg.ts,s.window = "periodic")
 temp.min.daily.decomp <- stl(temp.min.daily.ts,s.window = "periodic")
 electricity.monthly.decomp <- stl(electricity.monthly.ts,s.window = "periodic")
 
 temp.ts <- plot(temp.min.daily.decomp)
 energy.ts <- plot(energyload.daily.decomp)
+energy.avg.ts <- plot(energyload.daily.avg.decomp)
 electricity.ts <- plot(electricity.monthly.decomp)
- 
+
 ```
 
 Do a seasonal Mann Kendall test to evaluate trends in the three datasets.
@@ -75,19 +84,19 @@ electricity.monthly.detrended.result <- MannKendall(electricity.monthly.detrende
 summary(electricity.monthly.detrended.result)
 ```
 
-Detrended Mann Kendall test's result further supports that electricity price has been statistically significantly increasing through the past 8 years.
+Detrended Mann Kendall test's result further supports that electricity price has been statistically significantly increasing throughout the past 8 years.
 
-Lastly, we hope to predict future minimal temperature and energy load needed based on historical data. We will use Autoregressive Integrated Moving Average (ARIMA) package to do a prilimary simple forcasting.
+Lastly, we hope to predict future energy load needed based on historical data. We will use Autoregressive Integrated Moving Average (ARIMA) package to do a simple forecasting using historical energy load data from 2016 to 2023. Daily energy load data will contain too much noise and excessive workload for the function to run; therefore, we choose to use averaged daily load of each months.
 ```{r}
 library(forecast)
-#energy.prediction <- auto.arima(energyload.daily.ts,seasonal = TRUE)
+energy.prediction <- auto.arima(energyload.daily.avg.ts, seasonal = TRUE)
 summary(energy.prediction)
 # Check residuals
-checkresiduals(electricity.prediction)
+checkresiduals(energy.prediction)
 # Forecast
-min.temp.forecasted <- forecast(electricity.prediction, h = 12)
-plot(min.temp.forecasted)
-summary(min.temp.forecasted)
+energy.forecasted <- forecast(energy.prediction, h = 24)
+plot(energy.forecasted)
+summary(energy.forecasted)
 ```
 
 
