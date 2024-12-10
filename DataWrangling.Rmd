@@ -237,7 +237,6 @@ EnergyLoad_Daily <- EnergyLoad_Daily %>%
 
 #Rename the columns
 colnames(EnergyLoad_Daily) <- c("Date", "ERCOT(MW)")
-
 ```
 
 ```{r}
@@ -267,13 +266,40 @@ ElectricityPrice_Monthly <- ElectricityPrice_Monthly %>%
 ```
 
 ```{r}
+# Aggregate the load data to monthly daily averages
+Monthly_Load <- EnergyLoad_Daily %>%
+  mutate(month = format(Date, "%Y-%m")) %>% # Extract year-month
+  group_by(month) %>%
+  summarise(
+    MW = mean(`ERCOT(MW)`, na.rm = TRUE)
+  ) %>%
+  ungroup()
+```
+
+```{r}
+# Convert all the data and month to data format
+ElectricityPrice_Monthly$Date <- as.Date(ElectricityPrice_Monthly$Date)
+
+EnergyLoad_Daily$Date <- as.Date(EnergyLoad_Daily$Date)
+
+Monthly_Load$month <- as.Date(paste0(Monthly_Load$month, "-01"))
+
+weather_Texas_df$Date <- as.Date(weather_Texas_df$Date)
+
+```
+
+
+```{r}
 #Export processed data into Processed folder
 write.csv(EnergyLoad_Daily, row.names = FALSE, 
           file ="./Data/Processed/EnergyLoad_Daily.csv") 
+write.csv(Monthly_Load, row.names = FALSE, 
+          file ="./Data/Processed/Monthly_Load.csv") 
 write.csv(ElectricityPrice_Monthly, row.names = FALSE, 
           file ="./Data/Processed/ElectricityPrice_Monthly.csv") 
 write.csv(weather_Texas_df, row.names = FALSE, 
           file ="./Data/Processed/Temperature_MaxMin_Daily.csv") 
-
+write.csv(weather_Texas_df, row.names = FALSE, 
+          file ="./Data/Processed/Temperature_MaxMin_Daily.csv") 
 ```
 

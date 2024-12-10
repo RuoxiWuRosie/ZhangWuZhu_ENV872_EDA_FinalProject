@@ -17,6 +17,9 @@ EnergyLoad_Daily <-
   read.csv("./Data/Processed/EnergyLoad_Daily.csv")
 Temperature_Daily <-
   read.csv("./Data/Processed/Temperature_MaxMin_Daily.csv")
+Monthly_Load <-
+  read.csv("./Data/Processed/Monthly_Load.csv")
+
 
 #Convert the Date to data format
 ElectricityPrice_Monthly$Date <- as.Date(ElectricityPrice_Monthly$Date)
@@ -24,6 +27,8 @@ ElectricityPrice_Monthly$Date <- as.Date(ElectricityPrice_Monthly$Date)
 EnergyLoad_Daily$Date <- as.Date(EnergyLoad_Daily$Date)
 
 Temperature_Daily$Date <- as.Date(Temperature_Daily$Date)
+
+Monthly_Load$month <-as.Date(Monthly_Load$month)
 
 ```
 
@@ -42,23 +47,13 @@ extreme_cold_monthly <- Temperature_Daily %>%
   group_by(month) %>%  # Group by month
   summarise(`days` = sum(Extreme_Cold))
 
-# Aggregate the load data to monthly daily averages
-monthly_load <- EnergyLoad_Daily %>%
-  mutate(month = format(Date, "%Y-%m")) %>% # Extract year-month
-  group_by(month) %>%
-  summarise(
-    MW = mean(`ERCOT.MW.`, na.rm = TRUE)
-  ) %>%
-  ungroup()
 
 #Combined the monthly load, electricity price and extreme cold days data for the linear model. 
-
-monthly_load$month <- as.Date(paste0(monthly_load$month, "-01"))
 
 ElectricityPrice_Monthly <- ElectricityPrice_Monthly %>%
   rename(month=Date)
 
-extreme_cold_load_price <- monthly_load %>%
+extreme_cold_load_price <- Monthly_Load %>%
   left_join(extreme_cold_monthly, by = "month", na.rm==T) %>%
   left_join(ElectricityPrice_Monthly, by = "month", na.rm==T)
 ```
@@ -72,8 +67,8 @@ winter_data <- subset(extreme_cold_load_price, month_number %in% c("12", "01", "
 
 After we have the data with number of extreme cold days in a month, monthly energy load and monthly mean electricity price, we can use a linear model analysis to see if the number of cold days impact the monthly load and price.
 ```{r}
-# H0: The number of days in a month has no impacts on the amount of monthly energy load
-# Ha: The number of days in a month has impacts on the amount of monthly energy load
+# H0: The number of days in a month has no impacts on the average amount of monthly energy load
+# Ha: The number of days in a month has impacts on the average amount of monthly energy load
 
 # Number of days and load
 ModelLoad <- lm(MW ~ days, data = winter_data)
@@ -82,8 +77,8 @@ ModelLoad <- lm(MW ~ days, data = winter_data)
 summary(ModelLoad)
 ```
 
-The p-value if 0.00438, which is smaller than the significance level 0.05, so we reject the null hypothesis that number of extreme cold days has no impact on energy load. There is strong evidence that days has a significant effect on energy load. When there is no extreme cold day, the energy load is estimated to be 873,984 MW. For every one additional extreme cold day, 
-the energy load increases by 11,920 MW on average.
+The p-value is 0.00438, which is smaller than the significance level 0.05, so we reject the null hypothesis that number of extreme cold days has no impact on energy load. There is strong evidence that days has a significant effect on energy load. When there is no extreme cold day, the energy load is estimated to be 873,984 MW. For every one additional extreme cold day, 
+the monthly average energy load increases by 11,920 MW.
 
 ```{r}
 # Plot the data with the linear regression line
@@ -110,5 +105,19 @@ ModelPrice<- lm(Price.cent.KWh. ~ days, data = winter_data)
 # Summary of the model
 summary(ModelPrice)
 ```
-The p-value if 0.229, which is bigger than the significance level 0.05, so we fail to reject the null hypothesis that number of extreme cold days has no impact on electricity price. There is no strong evidence that days has a significant effect on electricity price.
+The p-value is 0.229, which is bigger than the significance level 0.05, so we fail to reject the null hypothesis that number of extreme cold days has no impact on electricity price. There is no strong evidence that days has a significant effect on electricity price.
+
+We then test if the number of extremely cold days and monthly energy load has impact the monthly electricity price. 
+
+```{r}
+# H0: The average energy load in a month has no impacts on the monthly electricity price
+# Ha: The average energy load in a month has impacts on the monthly electricity price
+
+ModelPriceLoad<- lm(Price.cent.KWh. ~ days+MW, data = winter_data)
+summary(ModelPriceLoad)
+```
+The p-value of days is 0.67448, which is bigger than the significance level 0.05, so we fail to reject the null hypothesis.
+
+The p-value of energy load is 0.00922, which is smaller than the significance level 0.05, so we reject the null hypothesis that the average energy load in a month has no impacts on the monthly electricity price. There is strong evidence that the average energy load in a month has has a significant effect on electricity price. When the energy load is 0, the price will be 1.450e+00 cent, and for every one additional MW in energy load, the electricity price will increase by 7.772e-06 cent per kWh.
+
 
