@@ -154,7 +154,7 @@ ggplot(combined_data, aes(x = avg_min_temp, y = Price)) +
   geom_point(color = "blue", size = 2) +  # Scatter plot
   geom_smooth(method = "lm", color = "red", linetype = "dashed") +  # Add regression line
   labs(
-    title = "Correlation Between Energy Load and Electricity Price",
+    title = "Correlation Between Minimimum Temperature and Electricity Price",
     x = "Monthly Average Min Temperature",
     y = "Electricity Price (cents/kWh)"
   ) +
