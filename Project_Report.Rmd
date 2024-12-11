@@ -38,7 +38,7 @@ library(trend)
 # Load datasets
 # This visualizes the temperature change overtime (year 2016-2023)
 temp_data_daily <- read.csv("Data/Processed/Temperature_MaxMin_Daily.csv")
-temp_data_daily$Date <- as.Date(temp_data$Date)
+temp_data_daily$Date <- as.Date(temp_data_daily$Date)
 
 # Import daily energy load data in 2016-2023
 EnergyLoad_Daily <-
@@ -79,6 +79,11 @@ combined_data <- combined_data %>% rename(Price = 'Price(cent/KWh)')
 
 # the last row of dataset is 2024-01, but the data is still not collected completely, so eliminate this row to ensure accuracy
 combined_data <- combined_data[-nrow(combined_data), ]
+
+# Keep winter data only.
+combined_data2 <-combined_data
+combined_data2$month_number <- format(combined_data2$month, "%m")
+winter_data <- subset(combined_data2, month_number %in% c("12", "01", "02"))
 ```
 
 
@@ -100,7 +105,7 @@ Data used for this analysis is from different sources. Historical records of tem
 
 Table 3.1: Table summarizing the data sources
   
-Data Sources
+Sources | Data
 -------------:|:-------------
 API  | Texas Daily Max and Min Temperature
 ERCOT | Texas Hourly Energy Load
@@ -171,7 +176,6 @@ ggplot(combined_data, aes(x = month, y = Price)) +
 
 ```
 
-
 \newpage
 
 # 6 Analysis
@@ -179,6 +183,75 @@ ggplot(combined_data, aes(x = month, y = Price)) +
 ## 6.1 Question 1: How did the frequency of extreme cold days changed in the past 8 years in Texas? How did local energy load and electricity price changed in these extreme cold days?
 
 ### 6.1.1 Frequency of extreme cold days:
+We used linear models analysis to find how frequency of extremely cold days impacts energy load and electricity price. 
+The analysis shows if the frequency of extreme cold days impacts energy load and electricity price or not. The report first analyzed the cold day frequency and energy load. 
+
+Table 1 Hypotheses 
+
+Hypothesis |  
+-----:|:-------------
+H0 | The frequency of extremely cold days in a month has no impacts on the average amount of monthly energy load
+Ha | The frequency of extremely cold days in a month has impacts on the average amount of monthly energy load
+
+```{r include=FALSE}
+# Number of days and load
+ModelLoad <- lm(MW ~ Extreme_Cold_days, data = winter_data)
+
+# Summary of the model
+summary(ModelLoad)
+```
+
+Table 2 Results
+```{r echo=FALSE}
+results_table <- data.frame(
+  Parameter = c("P-Value", "Intercept Estimate Std", "Extreme_Cold_days Estimate Std"),
+  Value = c(0.00438, 873984, 11920)
+)
+
+print(results_table)
+```
+
+The P-value is 0.00438, which is smaller than the significance level 0.05, so we reject the null hypothesis that number of extreme cold days has no impact on energy load. There is strong evidence that cold day frequency has a significant effect on energy load. When there is no extreme cold day, the energy load is estimated to be 873,984 MW. For every one additional extreme cold day, the monthly average energy load increases by 11,920 MW.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# Plot the data with the linear regression line
+ggplot(data = winter_data, aes(x = Extreme_Cold_days, y = MW)) +
+  geom_point(color = "blue", size = 2) + 
+  geom_smooth(method = "lm", color = "red", se = TRUE) + 
+  labs(
+    title = "Energy Load by Frequency of Extremely Cold Days",
+    x = "Frequency of Extremely Cold Days",
+    y = "Energy Load (MW)"
+  ) +
+  ylim(800000, 1200000)
+```
+
+The report then analyzed the cold day frequency and electricity price and found that there is no strong evidence that cold day frequency has a significant effect on electricity price.
+The report then analyzed the impact of energy load on electricity price.
+
+Table 3 Hypotheses 
+
+Hypothesis |  
+-----:|:-------------
+H0 | The average energy load in a month has no impacts on the monthly electricity price
+Ha | The average energy load in a month has impacts on the monthly electricity price
+
+```{r include=FALSE}
+ModelPriceLoad<- lm(Price ~ Extreme_Cold_days+MW, data = winter_data)
+summary(ModelPriceLoad)
+```
+
+Table 4 Results
+```{r echo=FALSE}
+results_table2 <- data.frame(
+  Parameter = c("P-Value", "Intercept Estimate Std", "Extreme_Cold_days Estimate Std"),
+  Value = c(0.00922, 1.450e+00, 7.772e-06)
+)
+
+print(results_table2)
+```
+
+The p-value of energy load is 0.00922, which is smaller than the significance level 0.05, so we reject the null hypothesis that the average energy load in a month has no impacts on the monthly electricity price. There is strong evidence that the average energy load in a month has has a significant effect on electricity price. When the energy load is 0, the price will be 1.450e+00 cent, and for every one additional MW in energy load, the electricity price will increase by 7.772e-06 cent per MW.
 
 ### 6.1.2 Energy load and electricity price change
 

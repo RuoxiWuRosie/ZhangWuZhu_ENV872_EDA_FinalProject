@@ -83,8 +83,8 @@ the monthly average energy load increases by 11,920 MW.
 ```{r}
 # Plot the data with the linear regression line
 ggplot(data = winter_data, aes(x = days, y = MW)) +
-  geom_point(color = "blue", size = 2) + # Scatter plot for points
-  geom_smooth(method = "lm", color = "red", se = TRUE) + # Linear regression line with confidence interval
+  geom_point(color = "blue", size = 2) + 
+  geom_smooth(method = "lm", color = "red", se = TRUE) + 
   labs(
     title = "Linear Model: MW vs Days",
     x = "Number of Days",
@@ -118,6 +118,6 @@ summary(ModelPriceLoad)
 ```
 The p-value of days is 0.67448, which is bigger than the significance level 0.05, so we fail to reject the null hypothesis.
 
-The p-value of energy load is 0.00922, which is smaller than the significance level 0.05, so we reject the null hypothesis that the average energy load in a month has no impacts on the monthly electricity price. There is strong evidence that the average energy load in a month has has a significant effect on electricity price. When the energy load is 0, the price will be 1.450e+00 cent, and for every one additional MW in energy load, the electricity price will increase by 7.772e-06 cent per kWh.
+The p-value of energy load is 0.00922, which is smaller than the significance level 0.05, so we reject the null hypothesis that the average energy load in a month has no impacts on the monthly electricity price. There is strong evidence that the average energy load in a month has has a significant effect on electricity price. When the energy load is 0, the price will be 1.450e+00 cent, and for every one additional MW in energy load, the electricity price will increase by 7.772e-06 cent per MW.
 
 
