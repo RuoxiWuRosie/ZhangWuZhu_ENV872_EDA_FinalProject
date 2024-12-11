@@ -15,11 +15,8 @@ output: html_document
 
 ```{r setup, include=FALSE}
 # Set your working directory
-# Load your packages
-# Load your datasets
 
 # Set your ggplot theme
-
 
 # Load your packages
 library(httr)
@@ -89,6 +86,9 @@ winter_data <- subset(combined_data2, month_number %in% c("12", "01", "02"))
 
 # 1 Rationale and Research Questions -- Background
 
+The 2021 Texas winter storm was a severe event that caused widespread power outages, major damage, and significant hardship for many people. With temperatures dropping as low as -2°F (-19°C), the storm pushed the state’s energy systems beyond their capacity. The combination of extreme cold and infrastructure failures showed how unprepared the system was for such events. This highlights the need to better understand cold weather extremes and their impact on energy systems to reduce risks and improve reliability during future storms.
+
+Our research focuses on studying how often extreme cold events happen in Texas and how they affect local energy demand and electricity prices. By looking at past 8 years of temperature and energy data, we hope to find patterns and trends that can help predict grid demand during future cold days. This information can support better planning and help ensure Texas is more prepared to handle similar events in the future. Our goal is to improve resilience and energy security for the state during winter.
 
 
 # 2 Research Questions:
