@@ -182,7 +182,6 @@ ggplot(combined_data, aes(x = month, y = Price)) +
 
 ## 6.1 Question 1: How did the frequency of extreme cold days changed in the past 8 years in Texas? How does this correlates with energy load and electricity price?
 
-
 ### 6.1.1 Frequency of extreme cold days:
 We used linear models analysis to find how frequency of extremely cold days impacts energy load and electricity price. 
 The analysis shows if the frequency of extreme cold days impacts energy load and electricity price or not. The report first analyzed the cold day frequency and energy load. 
@@ -252,12 +251,78 @@ results_table2 <- data.frame(
 print(results_table2)
 ```
 
+The p-value of energy load is 0.00922, which is smaller than the significance level 0.05, so we reject the null hypothesis that the average energy load in a month has no impacts on the monthly electricity price. There is strong evidence that the average energy load in a month has has a significant effect on electricity price. When the energy load is 0, the price will be 1.450e+00 cent, and for every one additional MW in energy load, the electricity price will increase by 7.772e-06 cent per MW.x
+
+Table 1 Hypotheses 
+
+Hypothesis |  
+-----:|:-------------
+H0 | The frequency of extremely cold days in a month has no impacts on the average amount of monthly energy load
+Ha | The frequency of extremely cold days in a month has impacts on the average amount of monthly energy load
+
+```{r include=FALSE}
+# Number of days and load
+ModelLoad <- lm(MW ~ Extreme_Cold_days, data = winter_data)
+
+# Summary of the model
+summary(ModelLoad)
+```
+
+Table 2 Results
+```{r echo=FALSE}
+results_table <- data.frame(
+  Parameter = c("P-Value", "Intercept Estimate Std", "Extreme_Cold_days Estimate Std"),
+  Value = c(0.00438, 873984, 11920)
+)
+
+print(results_table)
+```
+
+The P-value is 0.00438, which is smaller than the significance level 0.05, so we reject the null hypothesis that number of extreme cold days has no impact on energy load. There is strong evidence that cold day frequency has a significant effect on energy load. When there is no extreme cold day, the energy load is estimated to be 873,984 MW. For every one additional extreme cold day, the monthly average energy load increases by 11,920 MW.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# Plot the data with the linear regression line
+ggplot(data = winter_data, aes(x = Extreme_Cold_days, y = MW)) +
+  geom_point(color = "blue", size = 2) + 
+  geom_smooth(method = "lm", color = "red", se = TRUE) + 
+  labs(
+    title = "Energy Load by Frequency of Extremely Cold Days",
+    x = "Frequency of Extremely Cold Days",
+    y = "Energy Load (MW)"
+  ) +
+  ylim(800000, 1200000)
+```
+
+The report then analyzed the cold day frequency and electricity price and found that there is no strong evidence that cold day frequency has a significant effect on electricity price.
+The report then analyzed the impact of energy load on electricity price.
+
+Table 3 Hypotheses 
+
+Hypothesis |  
+-----:|:-------------
+H0 | The average energy load in a month has no impacts on the monthly electricity price
+Ha | The average energy load in a month has impacts on the monthly electricity price
+
+```{r include=FALSE}
+ModelPriceLoad<- lm(Price ~ Extreme_Cold_days+MW, data = winter_data)
+summary(ModelPriceLoad)
+```
+
+Table 4 Results
+```{r echo=FALSE}
+results_table2 <- data.frame(
+  Parameter = c("P-Value", "Intercept Estimate Std", "Extreme_Cold_days Estimate Std"),
+  Value = c(0.00922, 1.450e+00, 7.772e-06)
+)
+
+print(results_table2)
+```
+
 The p-value of energy load is 0.00922, which is smaller than the significance level 0.05, so we reject the null hypothesis that the average energy load in a month has no impacts on the monthly electricity price. There is strong evidence that the average energy load in a month has has a significant effect on electricity price. When the energy load is 0, the price will be 1.450e+00 cent, and for every one additional MW in energy load, the electricity price will increase by 7.772e-06 cent per MW.
 
 ## 6.2 Question 2: How did local energy load and electricity price changed in these extreme cold days?
-### 6.1.2 Energy load and electricity price change
 
-To find the trend of change in energy load and electricity price in 2016-2023, we utilizes a time series analysis to eliminate the influence of strong seasonality and other noises in data. Here are the overall trend of change of energy load throughout the past 8 years with daily and monthly averaged daily data respectively. From both graphs, we can see strong seasonality and an increasing trend in energy load. We further did a seasonal Mann Kenndall test, which proves that energy load was increasing statistically significantly (huge positive score with p-value < 0.05).
+To find the trend of change in energy load and electricity price in 2016-2023, we utilizes a time series analysis to eliminate the influence of strong seasonality and other noises in data. Here are the overall trend of change of energy load throughout the past 8 years with daily and monthly averaged daily data, respectively. From both graphs, we can see strong seasonality and an increasing trend in energy load. We further did a seasonal Mann Kenndall test, which proves that energy load was increasing statistically significantly (huge positive score with p-value < 0.05).
 
 ```{r echo=FALSE}
 # Generate three time series objects based on imported data
@@ -286,34 +351,57 @@ energyload.daily.trend <- Kendall::SeasonalMannKendall(energyload.daily.ts)
 summary(energyload.daily.trend)
 ```
 
-For electricity price, we also did time series analysis and seasonal Mann Kendall test; however, since electricity price is influenced by multiple factors aside from seasonality, such as market dynamics and policies, we also run a normal Mann Kendall test on detrended electricity data.
+For electricity price, we also did time series analysis and seasonal Mann Kendall test; however, since electricity price is influenced by multiple factors aside from seasonality, such as market dynamics and policies, we also run a normal Mann Kendall test on de-trended electricity data.
 
 ```{r echo=FALSE}
 # Time series plot for electricity
 plot(electricity.monthly.decomp)
-summary(electricity.monthly.trend)
 ```
 
 ```{r include=FALSE}
 # Seasonal Mann Kendall Test
 electricity.monthly.trend <- Kendall::SeasonalMannKendall(electricity.monthly.ts)
+summary(electricity.monthly.trend)
 
 # Mann Kendall on detrended electricity data
 electricity.monthly.Components <- 
   as.data.frame(electricity.monthly.decomp$time.series[,])
 electricity.monthly.detrended <- 
-  ElectricityPrice_Monthly$Price.cent.KWh. - electricity.monthly.Components$seasonal
+  ElectricityPrice_Monthly$`Price(cent/KWh)` - electricity.monthly.Components$seasonal
 
 electricity.monthly.detrended.result <- MannKendall(electricity.monthly.detrended)
 summary(electricity.monthly.detrended.result)
 
 ```
+```{r echo=FALSE}
+# Print the results
+results_table3 <- data.frame(
+  Parameter = c("Score", "2-sided p-value"),
+  Seasonal_MannKendall = c(162, 5.6949*10^-09),
+  Detrended_MannKendall = c(2112, 2.22*10^-16)
+)
 
+print(results_table3)
+```
 
+As shown in the table, both test results shows that electricity price has significantly increased in the past 8 years.
 
 ## 6.3 Question 3: If following the past trend, how much energy will be demanded for preparing extreme cold days in 2024 and 2025?
 
+Lastly, we hope to predict energy load in 2024 and 2025 based on historical data. We will use Autoregressive Integrated Moving Average (ARIMA) package to do a simple forecasting using historical energy load data from 2016 to 2023. However, daily energy load data will contain too much noise and excessive workload for the function to run; therefore, we choose to use averaged daily load of each months.
 
+```{r}
+energy.prediction <- auto.arima(energyload.daily.avg.ts, seasonal = TRUE)
+summary(energy.prediction)
+# Check residuals
+checkresiduals(energy.prediction)
+# Forecast
+energy.forecasted <- forecast(energy.prediction, h = 24)
+plot(energy.forecasted)
+summary(energy.forecasted)
+```
+
+The ARIMA test result shows that for the incoming winter (December 2024, Janurary and Feburary 2025), daily energy load in a normal winter day in Texas is predicted at 1124614 to 1162327 MW. We are at 95% confidence for the actual energy loaded be as high as 1278089 MW in Feburary and as low as 1013169.5 in December. 
 
 
 \newpage
