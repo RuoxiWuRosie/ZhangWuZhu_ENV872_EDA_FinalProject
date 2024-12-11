@@ -37,7 +37,8 @@ library(trend)
 
 # Load datasets
 # This visualizes the temperature change overtime (year 2016-2023)
-temp_data <- read.csv("Data/Processed/Temperature_MaxMin_Daily.csv")
+temp_data_daily <- read.csv("Data/Processed/Temperature_MaxMin_Daily.csv")
+temp_data_daily$Date <- as.Date(temp_data$Date)
 
 # Import daily energy load data in 2016-2023
 EnergyLoad_Daily <-
@@ -59,11 +60,11 @@ ElectricityPrice_Monthly <- ElectricityPrice_Monthly %>%
   rename(month = Date)
 
 #Build a new column "Extreme_Cold"
-temp_data <- temp_data %>%
+temp_data_daily <- temp_data_daily %>%
   mutate(Extreme_Cold = ifelse(Temperature_Min <= 0, 1, 0))
 
 # Aggregate the number of extreme cold days by month
-extreme_cold_monthly <- temp_data %>%
+extreme_cold_monthly <- temp_data_daily %>%
   mutate(month = floor_date(Date, "month")) %>%  # Extract the month
   group_by(month) %>%  # Group by month
   summarise(`Extreme_Cold_days` = sum(Extreme_Cold))
