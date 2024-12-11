@@ -31,6 +31,7 @@ library(zoo)
 library(tseries)
 library(Kendall)
 library(trend)
+library(forecast)
 
 # Load datasets
 # This visualizes the temperature change overtime (year 2016-2023)
