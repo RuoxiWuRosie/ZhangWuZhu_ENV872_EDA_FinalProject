@@ -180,7 +180,8 @@ ggplot(combined_data, aes(x = month, y = Price)) +
 
 # 6 Analysis
 
-## 6.1 Question 1: How did the frequency of extreme cold days changed in the past 8 years in Texas? How did local energy load and electricity price changed in these extreme cold days?
+## 6.1 Question 1: How did the frequency of extreme cold days changed in the past 8 years in Texas? How does this correlates with energy load and electricity price?
+
 
 ### 6.1.1 Frequency of extreme cold days:
 We used linear models analysis to find how frequency of extremely cold days impacts energy load and electricity price. 
@@ -253,6 +254,7 @@ print(results_table2)
 
 The p-value of energy load is 0.00922, which is smaller than the significance level 0.05, so we reject the null hypothesis that the average energy load in a month has no impacts on the monthly electricity price. There is strong evidence that the average energy load in a month has has a significant effect on electricity price. When the energy load is 0, the price will be 1.450e+00 cent, and for every one additional MW in energy load, the electricity price will increase by 7.772e-06 cent per MW.
 
+## 6.2 Question 2: How did local energy load and electricity price changed in these extreme cold days?
 ### 6.1.2 Energy load and electricity price change
 
 To find the trend of change in energy load and electricity price in 2016-2023, we utilizes a time series analysis to eliminate the influence of strong seasonality and other noises in data. Here are the overall trend of change of energy load throughout the past 8 years with daily and monthly averaged daily data respectively. From both graphs, we can see strong seasonality and an increasing trend in energy load. We further did a seasonal Mann Kenndall test, which proves that energy load was increasing statistically significantly (huge positive score with p-value < 0.05).
@@ -309,7 +311,7 @@ summary(electricity.monthly.detrended.result)
 
 
 
-## 6.2 Question 2: If following the past trend, how much energy will be demanded for preparing extreme cold days in 2024 and 2025?
+## 6.3 Question 3: If following the past trend, how much energy will be demanded for preparing extreme cold days in 2024 and 2025?
 
 
 
