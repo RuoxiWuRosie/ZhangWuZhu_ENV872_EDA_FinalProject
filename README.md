@@ -4,6 +4,7 @@ output:
   pdf_document: default
 ---
 # <Repository Title>
+# <ZhangWuZhu_ENV872_EDA_FinalProject>
 <Instructions: copy and paste this template into your project README file (found in the parent folder of the repository). Fill in relevant information as requested.>
 
 <General notes: add as much information as is relevant for your repository. Some overarching guidelines are provided, but feel free to expand on these guidelines.>
