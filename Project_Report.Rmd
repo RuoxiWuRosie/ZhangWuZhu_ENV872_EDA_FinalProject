@@ -391,7 +391,7 @@ As shown in the table, both test results shows that electricity price has signif
 
 Lastly, we hope to predict energy load in 2024 and 2025 based on historical data. We will use Autoregressive Integrated Moving Average (ARIMA) package to do a simple forecasting using historical energy load data from 2016 to 2023. However, daily energy load data will contain too much noise and excessive workload for the function to run; therefore, we choose to use averaged daily load of each months.
 
-```{r}
+```{r echo=FALSE}
 energy.prediction <- auto.arima(energyload.daily.avg.ts, seasonal = TRUE)
 summary(energy.prediction)
 # Check residuals
