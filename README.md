@@ -42,22 +42,22 @@ Extreme temperature, cold climate, electricity load, electricity price
 
 ## Database Information
 
- Data used for this analysis is from different sources. 
+Data used for this analysis is from different sources. 
  
- Historical records of temperature were found in the archive API https://archive-api.open-meteo.com/v1/era5. Given the information on Texas's latitude and longitude and the start and end dates from January 2016 to December 2023, the API archive could provide data on daily temperature in Texas from 2016 to 2023. The API gave the maximum and minimum temperatures in Texas from 2016 to 2023 in degrees Celsius. 
+Historical records of temperature were found in the archive API https://archive-api.open-meteo.com/v1/era5. Given the information on Texas's latitude and longitude and the start and end dates from January 2016 to December 2023, the API archive could provide data on daily temperature in Texas from 2016 to 2023. The API gave the maximum and minimum temperatures in Texas from 2016 to 2023 in degrees Celsius. 
 
 Data from outside sources: 
 
- In the Raw folder under the Data folder, there are two sub-folders: EnergyLoad_ercot and EnergyPrice. EnergyLoad_ercot: The Electric Reliability Council of Texas (ERCOT) gave hourly energy load data in Texas, from year 2016 to 2023, in MW. EnergyPrice: The U.S. Energy Information Administration (EIA) contained monthly average electricity price data in cent/kwh from 2001 to 2024. The data for daily electricity prices was unavailable.
+In the Raw folder under the Data folder, there are two sub-folders: EnergyLoad_ercot and EnergyPrice. EnergyLoad_ercot: The Electric Reliability Council of Texas (ERCOT) gave hourly energy load data in Texas, from year 2016 to 2023, in MW. EnergyPrice: The U.S. Energy Information Administration (EIA) contained monthly average electricity price data in cent/kwh from 2001 to 2024. The data for daily electricity prices was unavailable.
  
- All of the data from the three sources used in this analysis had a date column, which could ensure the time series analysis's viability. The data had continuous data on daily temperature, hourly load, and monthly price, which would be used for both time series and linear model analysis. All of the outside data listed above was accessed and retrieved in November 2024.
+All of the data from the three sources used in this analysis had a date column, which could ensure the time series analysis's viability. The data had continuous data on daily temperature, hourly load, and monthly price, which would be used for both time series and linear model analysis. All of the outside data listed above was accessed and retrieved in November 2024.
  
- The Raw data were all wrangled in the Data_Wrangling rmd file and the exported csv files are stored in the Processed folder under the Data folder. 
+The Raw data were all wrangled in the Data_Wrangling rmd file and the exported csv files are stored in the Processed folder under the Data folder. 
  
 
 ## Folder structure, file formats, and naming conventions 
 
- We have 3 general folders: Data, Data Wrangling & Analysis, Report
+We have 3 general folders: Data, Data Wrangling & Analysis, Report
 - Data folder: this folder contains csv data in 2 categories. Processed data: extracted and wrangled. Raw: data extracted directly from online searching or scrapping
 - Data Wrangling & Analysis folder: this folder contains rmd files for data wrangling (which output were exported to Processed Data folder) and analysis process (Time Series, Linear Modeling, Visualizations)
 - Report folder: Our final project report rmd file and html output is located in this folder.
