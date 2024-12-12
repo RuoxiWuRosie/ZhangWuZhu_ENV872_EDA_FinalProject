@@ -115,9 +115,9 @@ Our research focuses on studying how often extreme cold events happen in Texas a
 
 
 # Research Questions:
- 1. How does the frequency of extreme cold days correlates with energy load and electricity price in Texas?
+ 1. How did local energy load and electricity price changed in 2016-2023?
 
- 2. How did local energy load and electricity price changed in these extreme cold days?
+ 2. How does the frequency of extreme cold days correlates with energy load and electricity price in Texas?
  
  3. If following the past trend, how much energy will be demanded for preparing extreme cold days in 2024 and 2025?
 
@@ -172,7 +172,7 @@ ggplot(combined_data, aes(x = month, y = Extreme_Cold_days)) +
 According to the line graph from 2016 to 2023, the energy load is generally increasing overtime with great pattern of seasonality, and it has spiked in mid-2023. General trend will be explained later in time series analysis.
 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.cap = "Fig 2. Averaged daily energy load from year 2016 to 2023 in Texas by month.", fig.align='center'}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.cap = "Fig.3 Averaged daily energy load from year 2016 to 2023 in Texas by month.", fig.align='center'}
 ggplot(combined_data, aes(x = month, y = MW)) +
   geom_line(color = "blue", size = 1) +  # Line graph
   geom_smooth(method = "lm", color = "red", linetype = "dashed") +  # Add regression line
@@ -206,101 +206,11 @@ ggplot(combined_data, aes(x = month, y = Price)) +
 
 # Analysis
 
-
-## Question 1: How does the frequency of extreme cold days correlates with energy load and electricity price?
-
-
-### Frequency of extreme cold days
-
-
-We used linear models analysis to find how frequency of extremely cold days impacts energy load and electricity price. 
-The analysis shows if the frequency of extreme cold days impacts energy load and electricity price or not. The report first analyzed the cold day frequency and energy load. 
-
-```{r table1, echo= FALSE}
-# This following table is Hypothesis for the linear regression test for cold days impacts on monthly load, this cell is to help references for the list of tables
-```
-
-
-Table 1 Hypotheses 
-
-Hypothesis |  
------:|:-------------
-H0 | The frequency of extremely cold days in a month has no impacts on the average amount of monthly energy load
-Ha | The frequency of extremely cold days in a month has impacts on the average amount of monthly energy load
-
-```{r include=FALSE}
-# Number of days and load
-ModelLoad <- lm(MW ~ Extreme_Cold_days, data = winter_data)
-
-# Summary of the model
-summary(ModelLoad)
-```
-
-Table 2 Results
-```{r table2, echo=FALSE}
-results_table <- data.frame(
-  Parameter = c("P-Value", "Intercept Estimate Std", "Extreme_Cold_days Estimate Std"),
-  Value = c(0.00438, 873984, 11920)
-)
-
-print(results_table)
-```
-
-The P-value is 0.00438, which is smaller than the significance level 0.05, so we reject the null hypothesis that number of extreme cold days has no impact on energy load. There is strong evidence that cold day frequency has a significant effect on energy load. When there is no extreme cold day, the energy load is estimated to be 873,984 MW. For every one additional extreme cold day, the monthly average energy load increases by 11,920 MW.
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.cap = "Fig. Linear regression between the Energy Load and # of extremely cold days (<0 degree Celsius).", fig.align='center'}
-# Plot the data with the linear regression line
-ggplot(data = winter_data, aes(x = Extreme_Cold_days, y = MW)) +
-  geom_point(color = "blue", size = 2) + 
-  geom_smooth(method = "lm", color = "red", se = TRUE) + 
-  labs(
-    title = "Energy Load by Frequency of Extremely Cold Days",
-    x = "Frequency of Extremely Cold Days",
-    y = "Energy Load (MW)"
-  ) +
-  ylim(800000, 1200000)
-```
-
-
-The report then analyzed the cold day frequency and electricity price and found that there is no strong evidence that cold day frequency has a significant effect on electricity price.
-The report then analyzed the impact of energy load on electricity price.
-
-```{r table3, echo=FALSE}
-# this cell is created for list of tables references for table 3
-```
-
-
-Table 3 Hypotheses 
-
-Hypothesis |  
------:|:-------------
-H0 | The average energy load in a month has no impacts on the monthly electricity price
-Ha | The average energy load in a month has impacts on the monthly electricity price
-
-```{r include=FALSE}
-ModelPriceLoad<- lm(Price ~ Extreme_Cold_days+MW, data = winter_data)
-summary(ModelPriceLoad)
-```
-
-Table 4 Results
-```{r table4, echo=FALSE}
-results_table2 <- data.frame(
-  Parameter = c("P-Value", "Intercept Estimate Std", "Extreme_Cold_days Estimate Std"),
-  Value = c(0.00922, 1.450e+00, 7.772e-06)
-)
-
-print(results_table2)
-```
-
-The p-value of energy load is 0.00922, which is smaller than the significance level 0.05, so we reject the null hypothesis that the average energy load in a month has no impacts on the monthly electricity price. There is strong evidence that the average energy load in a month has has a significant effect on electricity price. When the energy load is 0, the price will be 1.450e+00 cent, and for every one additional MW in energy load, the electricity price will increase by 7.772e-06 cent per MW.x
-
-
-
-## Question 2: How did local energy load and electricity price changed in these extreme cold days?
+## Question 1: How did local energy load and electricity price changed in 2016-2023?
 
 To find the trend of change in energy load and electricity price in 2016-2023, we utilizes a time series analysis to eliminate the influence of strong seasonality and other noises in data. Here are the overall trend of change of energy load throughout the past 8 years with daily and monthly averaged daily data, respectively. From both graphs, we can see strong seasonality and an increasing trend in energy load. We further did a seasonal Mann Kenndall test, which proves that energy load was increasing statistically significantly (huge positive score with p-value < 0.05).
 
-```{r echo=FALSE, fig.cap = "Fig 5. Visualization of Time Series Analysis of the daily energy load from 2016 to 2023 in Texas. Trend = data - seasonal - reminder ", fig.align='center'}
+```{r echo=FALSE, fig.cap = "Fig.4 Visualization of Time Series Analysis of the daily energy load from 2016 to 2023 in Texas. Trend = data - seasonal - reminder ", fig.align='center'}
 # Generate three time series objects based on imported data
 electricity.monthly.ts <- ts(ElectricityPrice_Monthly$`Price(cent/KWh)`,
                    start=c(2016,01), end = c(2023,12),
@@ -320,7 +230,7 @@ electricity.monthly.decomp <- stl(electricity.monthly.ts,s.window = "periodic")
 plot(energyload.daily.decomp)
 ```
 
-```{r echo=FALSE, fig.cap = "Fig 6. Visualization of Time Series Analysis of the averaged daily energy load from 2016 to 2023 in Texas by month", fig.align='center'}
+```{r echo=FALSE, fig.cap = "Fig.5 Visualization of Time Series Analysis of the averaged daily energy load from 2016 to 2023 in Texas by month", fig.align='center'}
 plot(energyload.daily.avg.decomp)
 
 ```
@@ -333,7 +243,7 @@ summary(energyload.daily.trend)
 
 For electricity price, we also did time series analysis and seasonal Mann Kendall test; however, since electricity price is influenced by multiple factors aside from seasonality, such as market dynamics and policies, we also run a normal Mann Kendall test on de-trended electricity data. Below is the time series analysis graph of average monthly electricity price; the clear peak around 2021 indicates the storm event, which is 12.58 cents/kWh.
 
-```{r echo=FALSE, fig.cap = "Fig 7. Visualization of Time Series Analysis of the averaged monthly electricity price from 2016 to 2023 in Texas", fig.align='center'}
+```{r echo=FALSE, fig.cap = "Fig.6 Visualization of Time Series Analysis of the averaged monthly electricity price from 2016 to 2023 in Texas", fig.align='center'}
 # Time series plot for electricity
 plot(electricity.monthly.decomp)
 ```
@@ -354,8 +264,8 @@ summary(electricity.monthly.detrended.result)
 
 ```
 
-Table 5. Results of Seasonal Mann Kendall and Mann Kendall tests with detrended data.
-```{r table5, echo=FALSE}
+Table 1. Results of Seasonal Mann Kendall and Mann Kendall tests with detrended data.
+```{r table1, echo=FALSE}
 # Print the results
 results_table3 <- data.frame(
   Parameter = c("Score", "2-sided p-value"),
@@ -368,6 +278,87 @@ print(results_table3)
 
 As shown in the table, both test results shows that electricity price has significantly increased in the past 8 years, with high score value and very low p-values. Detrended Mann Kendall test results show a much higher increasing tendency with very high possibility.
 
+
+## Question 2: How does the frequency of extreme cold days correlates with energy load and electricity price?
+
+
+We used linear models analysis to find how frequency of extremely cold days impacts energy load and electricity price. 
+The analysis shows if the frequency of extreme cold days impacts energy load and electricity price or not. The report first analyzed the cold day frequency and energy load. 
+
+
+Table 2 Hypotheses 
+
+Hypothesis |  
+-----:|:-------------
+H0 | The frequency of extremely cold days in a month has no impacts on the average amount of monthly energy load
+Ha | The frequency of extremely cold days in a month has impacts on the average amount of monthly energy load
+
+```{r include=FALSE}
+# Number of days and load
+ModelLoad <- lm(MW ~ Extreme_Cold_days, data = winter_data)
+
+# Summary of the model
+summary(ModelLoad)
+```
+
+Table 3 Results
+```{r table2, echo=FALSE}
+results_table <- data.frame(
+  Parameter = c("P-Value", "Intercept Estimate Std", "Extreme_Cold_days Estimate Std"),
+  Value = c(0.00438, 873984, 11920)
+)
+
+print(results_table)
+```
+
+The P-value is 0.00438, which is smaller than the significance level 0.05, so we reject the null hypothesis that number of extreme cold days has no impact on energy load. There is strong evidence that cold day frequency has a significant effect on energy load. When there is no extreme cold day, the energy load is estimated to be 873,984 MW. For every one additional extreme cold day, the monthly average energy load increases by 11,920 MW.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.cap = "Fig.7 Linear regression between the Energy Load and # of extremely cold days (<0 degree Celsius).", fig.align='center'}
+# Plot the data with the linear regression line
+ggplot(data = winter_data, aes(x = Extreme_Cold_days, y = MW)) +
+  geom_point(color = "blue", size = 2) + 
+  geom_smooth(method = "lm", color = "red", se = TRUE) + 
+  labs(
+    title = "Energy Load by Frequency of Extremely Cold Days",
+    x = "Frequency of Extremely Cold Days",
+    y = "Energy Load (MW)"
+  ) +
+  ylim(800000, 1200000)
+```
+
+The report then analyzed the cold day frequency and electricity price and found that there is no strong evidence that cold day frequency has a significant effect on electricity price.
+The report then analyzed the impact of energy load on electricity price.
+
+```{r table3, echo=FALSE}
+# this cell is created for list of tables references for table 3
+```
+
+
+Table 4 Hypotheses 
+
+Hypothesis |  
+-----:|:-------------
+H0 | The average energy load in a month has no impacts on the monthly electricity price
+Ha | The average energy load in a month has impacts on the monthly electricity price
+
+```{r include=FALSE}
+ModelPriceLoad<- lm(Price ~ Extreme_Cold_days+MW, data = winter_data)
+summary(ModelPriceLoad)
+```
+
+Table 5 Results
+```{r table4, echo=FALSE}
+results_table2 <- data.frame(
+  Parameter = c("P-Value", "Intercept Estimate Std", "Extreme_Cold_days Estimate Std"),
+  Value = c(0.00922, 1.450e+00, 7.772e-06)
+)
+
+print(results_table2)
+```
+
+The p-value of energy load is 0.00922, which is smaller than the significance level 0.05, so we reject the null hypothesis that the average energy load in a month has no impacts on the monthly electricity price. There is strong evidence that the average energy load in a month has has a significant effect on electricity price. When the energy load is 0, the price will be 1.450e+00 cent, and for every one additional MW in energy load, the electricity price will increase by 7.772e-06 cent per MW.
+
+
 ## Question 3: If following the past trend, how much energy will be demanded for preparing extreme cold days in 2024 and 2025?
 
 Lastly, we hope to predict energy load in 2024 and 2025 based on historical data. We will use Autoregressive Integrated Moving Average (ARIMA) package to do a simple forecasting using historical energy load data from 2016 to 2023. However, daily energy load data will contain too much noise and excessive workload for the function to run; therefore, we choose to use averaged daily load of each months.
@@ -379,7 +370,7 @@ summary(energy.prediction)
 checkresiduals(energy.prediction)
 ```
 
-```{r fig.cap= "Forcasted Results of the Prediction of Energy Load in 2024 and 2025", fig.align='center', echo=FALSE}
+```{r fig.cap= "Fig.8 Forcasted Results of the Prediction of Energy Load in 2024 and 2025", fig.align='center', echo=FALSE}
 # Forecast
 energy.forecasted <- forecast(energy.prediction, h = 24)
 plot(energy.forecasted)
@@ -395,9 +386,25 @@ The ARIMA test result shows that for the incoming winter (December 2024, Janurar
 \newpage
 
 # Summary and Conclusions
+Our analysis of extreme cold weather, energy demand and electricity pricing in Texas between 2016 and 2023 highlights several critical conclusions, corresponding to our three research questions proposed.
 
+## How did local energy load and electricity price changed in 2016-2023?
 
-\newpage
+Over the eight-year period, the energy load exhibited a clear increasing trend, coupled with strong seasonality. Average monthly electricity prices showed a general increasing trend over the years, with a pronounced spike in early 2021 during the Texas winter storm event. 
+Time series decomposition and Seasonal Mann-Kendall tests confirmed a statistically significant positive trend in energy load and electricity prices, with p-values indicating a high level of confidence.
+
+## How does the frequency of extreme cold days correlates with energy load and electricity price in Texas? 
+
+The frequency of days with temperatures below freezing (<0°C) was notably high during January 2021 and 2022, aligning with significant cold fronts that stressed the energy grid. Extreme cold events correlate with increased energy demand, as demonstrated by significant increases in monthly average energy load during colder months. However, we do not see direct correlation of extreme cold events and electricity price with statistically significant results.
+
+A linear regression model showed that each additional extreme cold day in a month increases the monthly average energy load by 11,920 MW. This relationship was statistically significant, with a p-value of 0.00438, indicating that extreme cold days are a strong predictor of increased energy demand.
+
+While extreme cold days impact energy load, no significant relationship was found between the frequency of extreme cold days and electricity prices. This suggests that pricing is more influenced by external factors such as supply constraints and policy interventions.
+
+## If following the past trend, how much energy will be demanded for preparing extreme cold days in 2024 and 2025?
+
+Based on the ARIMA test results, the predicted daily energy demand for normal winter days in Texas during December 2024 through February 2025 ranges from 1,124,614 to 1,162,327 MW. However, with 95% confidence, the energy demand could peak as high as 1,278,089 MW in February or drop to as low as 1,013,169.5 MW in December. These projections emphasize the importance of strengthening energy infrastructure and planning to handle peak demands during extreme cold spells in Texas. Preparing the grid to ensure a reliable energy supply will be crucial for ERCOT to avoid future disruptions and keep systems running smoothly throughout the winter.
+
 
 # References
 <add references here if relevant, otherwise delete this section> 
