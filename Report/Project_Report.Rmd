@@ -3,12 +3,12 @@ title: "Forecasting Energy Demand for Extreme Low Temperature Events in Texas"
 author: "Judy Hua Zhu, Ruoxi Wu, Zhaoxin Zhang"
 date: "2024-12-10"
 output: 
+  pdf_document:
+    keep_tex: yes
+    fig_caption: yes
   bookdown::html_document2:
     df_print: paged
     toc: true
-    fig_caption: yes
-  pdf_document:
-    keep_tex: yes
     fig_caption: yes
 subtitle: https://github.com/RuoxiWuRosie/ZhangWuZhu_ENV872_EDA_FinalProject.git 
 geometry: margin=2.54cm
