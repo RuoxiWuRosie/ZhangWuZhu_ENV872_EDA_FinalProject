@@ -13,9 +13,11 @@ The 2021 Texas winter storm was a severe and unprecedented cold weather event th
 Our team wishes to study the trend of occurrence of extreme low temperature events in Texas, and how does these events correlate with the local energy demand and electricity price. Using historical data, we hope to predict the grid demand for future extreme cold days for preparedness, increasing local resilience and energy security in winter.
 
 The main research questions we are trying to answer are:
-1. How did the frequency of extreme cold days changed in the past 8 years in Texas? How did local energy demand and electricity price changed in these extreme cold days?
-2. How did local energy load and electricity price changed in these extreme cold days?
-3.  If following the past trend, how much energy will be demanded for preparing extreme cold days in 2024 and 2025?
+ 1. How did local energy load and electricity price changed in 2016-2023?
+
+ 2. How does the frequency of extreme cold days correlates with energy load and electricity price in Texas?
+ 
+ 3. If following the past trend, how much energy will be demanded for preparing extreme cold days in 2024 and 2025?
 
 
 ## Investigators
