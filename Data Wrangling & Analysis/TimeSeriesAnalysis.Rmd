@@ -80,7 +80,7 @@ summary(electricity.monthly.trend)
 summary(energyload.daily.trend)
 summary(temp.min.daily.trend)
 ```
-The seasonal Mann Kendall tests results showed that electricity price and energy load has been statistically increasing throughout 2016 to 2023 (positive score with p-value < 0.05); however, minimal temperature has been decreasing, but not statistically significant (p-value =0.72513 > 0.05) . We use seasonal Mann Kendall test because seasonal pattern is significant in these three datasets. Since electricity price is influenced by multiple factors, such as market dynamics and policies, we decide to run a Mann Kendall test on detrended electricity data.
+The seasonal Mann Kendall tests results showed that electricity price and energy load has been statistically increasing throughout 2016 to 2023 (positive score with p-value < 0.05); however, minimal temperature has been decreasing, but not statistically significant (p-value =0.72513 > 0.05), which might due to increasing temperature in summer. We use seasonal Mann Kendall test because seasonal pattern is significant in these three datasets. Since electricity price is influenced by multiple factors, such as market dynamics and policies, we decide to run a Mann Kendall test on detrended electricity data.
 ```{r}
 electricity.monthly.Components <- 
   as.data.frame(electricity.monthly.decomp$time.series[,])
