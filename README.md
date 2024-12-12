@@ -3,8 +3,8 @@ output:
   html_document: default
   pdf_document: default
 ---
-# <Repository Title>
-# <ZhangWuZhu_ENV872_EDA_FinalProject>
+
+# ZhangWuZhu_ENV872_EDA_FinalProject
 
 ## Summary
 
