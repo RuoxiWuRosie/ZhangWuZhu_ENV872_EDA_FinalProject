@@ -110,7 +110,7 @@ winter_data <- subset(combined_data2, month_number %in% c("12", "01", "02"))
 
 # Rationale and Research Questions -- Background
 
-The 2021 Texas winter storm was a severe event that caused widespread power outages, major damage, and significant hardship for many people. With temperatures dropping as low as -2°F (-19°C), the storm pushed the state’s energy systems beyond their capacity. The combination of extreme cold and infrastructure failures showed how unprepared the system was for such events. This highlights the need to better understand cold weather extremes and their impact on energy systems to reduce risks and improve reliability during future storms.
+The 2021 Texas winter storm was a severe event that caused widespread power outages, major damage, and significant hardship for many people. With temperatures dropping as low as -2°F (-19°C), which was much lower than the defined "extreme cold" temperature 32.0°F (0°C) [1], the storm pushed the state’s energy systems beyond their capacity.The combination of extreme cold and infrastructure failures showed how unprepared the system was for such events. This highlights the need to better understand cold weather extremes and their impact on energy systems to reduce risks and improve reliability during future storms.
 
 Our research focuses on studying how often extreme cold events happen in Texas and how they affect local energy demand and electricity prices. By looking at past 8 years of temperature and energy data, we hope to find patterns and trends that can help predict grid demand during future cold days. This information can support better planning and help ensure Texas is more prepared to handle similar events in the future. Our goal is to improve resilience and energy security for the state during winter.
 
@@ -146,7 +146,7 @@ All the data's Date columns were converted to "date" format, and all other colum
 
 # Exploratory Analysis
 
-### Extreme cold days in Texas from 2016-2023
+## Extreme cold days in Texas from 2016-2023
 
 According to the visualization of the \# of days \<0 degree celsius in each month in Texas from 2016-01 to 2023-12, number of below-freezing days in January 2021 and 2022 are the highest. Also, the time range (number of months) for extremely cold days are highest in 2021, which align with the news of power breakouts in 2021 in Texas due to the abnormal cold-front.
 
@@ -164,7 +164,7 @@ ggplot(combined_data, aes(x = month, y = Extreme_Cold_days)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-### Energy Load in Texas from 2016-2023
+## Energy Load in Texas from 2016-2023
 
 According to the line graph from 2016 to 2023, the energy load is generally increasing overtime with great pattern of seasonality, and it has spiked in mid-2023. General trend will be explained later in time series analysis.
 
@@ -179,7 +179,7 @@ ggplot(combined_data, aes(x = month, y = MW)) +
   mytheme
 ```
 
-### Monthly electricity price in Texas from 2016-2023
+## Monthly electricity price in Texas from 2016-2023
 
 The electricity price in Texas is increasing overtime from 2016-2023 with slight but less consistent seasonality. However, the electricity price spike around early 2021, which could be a reflection from the large-scale blackout in the winter in Texas. The state-wide grid and local distribution systems were struggling to recover to cater the demand from the local residents and business during and right after the cold-front.
 
@@ -197,7 +197,7 @@ ggplot(combined_data, aes(x = month, y = Price)) +
 
 # Analysis
 
-### Question 1: How did local energy load and electricity price changed in 2016-2023?
+## Question 1: How did local energy load and electricity price changed in 2016-2023?
 
 To find the trend of change in energy load and electricity price in 2016-2023, we utilizes a time series analysis to eliminate the influence of strong seasonality and other noises in data. Here are the overall trend of change of energy load throughout the past 8 years with daily and monthly averaged daily data, respectively. From both graphs, we can see strong seasonality and an increasing trend in energy load. We further did a seasonal Mann Kenndall test, which proves that energy load was increasing statistically significantly (huge positive score with p-value \< 0.05).
 
@@ -270,7 +270,7 @@ print(results_table3)
 
 As shown in the table, both test results shows that electricity price has significantly increased in the past 8 years, with high score value and very low p-values. Detrended Mann Kendall test results show a much higher increasing tendency with very high possibility.
 
-### Question 2: How does the frequency of extreme cold days correlates with energy load and electricity price?
+## Question 2: How does the frequency of extreme cold days correlates with energy load and electricity price?
 
 We used linear models analysis to find how frequency of extremely cold days impacts energy load and electricity price. The analysis shows if the frequency of extreme cold days impacts energy load and electricity price or not. The report first analyzed the cold day frequency and energy load.
 
@@ -346,7 +346,7 @@ print(results_table2)
 
 The p-value of energy load is 0.00922, which is smaller than the significance level 0.05, so we reject the null hypothesis that the average energy load in a month has no impacts on the monthly electricity price. There is strong evidence that the average energy load in a month has has a significant effect on electricity price. When the energy load is 0, the price will be 1.450e+00 cent, and for every one additional MW in energy load, the electricity price will increase by 7.772e-06 cent per MW.
 
-### Question 3: If following the past trend, how much energy will be demanded for preparing extreme cold days in 2024 and 2025?
+## Question 3: If following the past trend, how much energy will be demanded for preparing extreme cold days in 2024 and 2025?
 
 Lastly, we hope to predict energy load in 2024 and 2025 based on historical data. We will use Autoregressive Integrated Moving Average (ARIMA) package to do a simple forecasting using historical energy load data from 2016 to 2023. However, daily energy load data will contain too much noise and excessive workload for the function to run; therefore, we choose to use averaged daily load of each months.
 
@@ -375,11 +375,11 @@ The ARIMA test result shows that for the incoming winter (December 2024, Janurar
 
 Our analysis of extreme cold weather, energy demand and electricity pricing in Texas between 2016 and 2023 highlights several critical conclusions, corresponding to our three research questions proposed.
 
-#### How did local energy load and electricity price changed in 2016-2023?
+### How did local energy load and electricity price changed in 2016-2023?
 
 Over the eight-year period, the energy load exhibited a clear increasing trend, coupled with strong seasonality. Average monthly electricity prices showed a general increasing trend over the years, with a pronounced spike in early 2021 during the Texas winter storm event. Time series decomposition and Seasonal Mann-Kendall tests confirmed a statistically significant positive trend in energy load and electricity prices, with p-values indicating a high level of confidence.
 
-#### How does the frequency of extreme cold days correlates with energy load and electricity price in Texas?
+### How does the frequency of extreme cold days correlates with energy load and electricity price in Texas?
 
 The frequency of days with temperatures below freezing (\<0°C) was notably high during January 2021 and 2022, aligning with significant cold fronts that stressed the energy grid. Extreme cold events correlate with increased energy demand, as demonstrated by significant increases in monthly average energy load during colder months. However, we do not see direct correlation of extreme cold events and electricity price with statistically significant results.
 
@@ -387,10 +387,11 @@ A linear regression model showed that each additional extreme cold day in a mont
 
 While extreme cold days impact energy load, no significant relationship was found between the frequency of extreme cold days and electricity prices. This suggests that pricing is more influenced by external factors such as supply constraints and policy interventions.
 
-#### If following the past trend, how much energy will be demanded for preparing extreme cold days in 2024 and 2025?
+### If following the past trend, how much energy will be demanded for preparing extreme cold days in 2024 and 2025?
 
 Based on the ARIMA test results, the predicted daily energy demand for normal winter days in Texas during December 2024 through February 2025 ranges from 1,124,614 to 1,162,327 MW. However, with 95% confidence, the energy demand could peak as high as 1,278,089 MW in February or drop to as low as 1,013,169.5 MW in December. These projections emphasize the importance of strengthening energy infrastructure and planning to handle peak demands during extreme cold spells in Texas. Preparing the grid to ensure a reliable energy supply will be crucial for ERCOT to avoid future disruptions and keep systems running smoothly throughout the winter.
 
 # References
 
-\<add references here if relevant, otherwise delete this section\>
+\<[1] NOAA’s National Weather Service. n.d. “Stay Safe in the Extreme Cold.” https://www.weather.gov/dlh/extremecold.\>
+

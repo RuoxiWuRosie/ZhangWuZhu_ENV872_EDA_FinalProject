@@ -1660,7 +1660,18 @@ load and electricity price?</a></li>
 3: If following the past trend, how much energy will be demanded for
 preparing extreme cold days in 2024 and 2025?</a></li>
 </ul></li>
-<li><a href="#summary-and-conclusions" id="toc-summary-and-conclusions">Summary and Conclusions</a></li>
+<li><a href="#summary-and-conclusions" id="toc-summary-and-conclusions">Summary and Conclusions</a>
+<ul>
+<li><a href="#how-did-local-energy-load-and-electricity-price-changed-in-2016-2023" id="toc-how-did-local-energy-load-and-electricity-price-changed-in-2016-2023">How
+did local energy load and electricity price changed in
+2016-2023?</a></li>
+<li><a href="#how-does-the-frequency-of-extreme-cold-days-correlates-with-energy-load-and-electricity-price-in-texas" id="toc-how-does-the-frequency-of-extreme-cold-days-correlates-with-energy-load-and-electricity-price-in-texas">How
+does the frequency of extreme cold days correlates with energy load and
+electricity price in Texas?</a></li>
+<li><a href="#if-following-the-past-trend-how-much-energy-will-be-demanded-for-preparing-extreme-cold-days-in-2024-and-2025" id="toc-if-following-the-past-trend-how-much-energy-will-be-demanded-for-preparing-extreme-cold-days-in-2024-and-2025">If
+following the past trend, how much energy will be demanded for preparing
+extreme cold days in 2024 and 2025?</a></li>
+</ul></li>
 <li><a href="#references" id="toc-references">References</a></li>
 </ul>
 </div>
@@ -1669,12 +1680,13 @@ preparing extreme cold days in 2024 and 2025?</a></li>
 <h1>Rationale and Research Questions – Background</h1>
 <p>The 2021 Texas winter storm was a severe event that caused widespread
 power outages, major damage, and significant hardship for many people.
-With temperatures dropping as low as -2°F (-19°C), the storm pushed the
-state’s energy systems beyond their capacity. The combination of extreme
-cold and infrastructure failures showed how unprepared the system was
-for such events. This highlights the need to better understand cold
-weather extremes and their impact on energy systems to reduce risks and
-improve reliability during future storms.</p>
+With temperatures dropping as low as -2°F (-19°C), which was much lower
+than the defined “extreme cold” temperature 32.0°F (0°C) [1], the storm
+pushed the state’s energy systems beyond their capacity.The combination
+of extreme cold and infrastructure failures showed how unprepared the
+system was for such events. This highlights the need to better
+understand cold weather extremes and their impact on energy systems to
+reduce risks and improve reliability during future storms.</p>
 <p>Our research focuses on studying how often extreme cold events happen
 in Texas and how they affect local energy demand and electricity prices.
 By looking at past 8 years of temperature and energy data, we hope to
@@ -1773,8 +1785,8 @@ details in preliminary data wrangling.l</p>
 </div>
 <div id="exploratory-analysis" class="section level1">
 <h1>Exploratory Analysis</h1>
-<div id="extreme-cold-days-in-texas-from-2016-2023" class="section level3">
-<h3>Extreme cold days in Texas from 2016-2023</h3>
+<div id="extreme-cold-days-in-texas-from-2016-2023" class="section level2">
+<h2>Extreme cold days in Texas from 2016-2023</h2>
 <p>According to the visualization of the # of days &lt;0 degree celsius
 in each month in Texas from 2016-01 to 2023-12, number of below-freezing
 days in January 2021 and 2022 are the highest. Also, the time range
@@ -1789,8 +1801,8 @@ Texas.
 </p>
 </div>
 </div>
-<div id="energy-load-in-texas-from-2016-2023" class="section level3">
-<h3>Energy Load in Texas from 2016-2023</h3>
+<div id="energy-load-in-texas-from-2016-2023" class="section level2">
+<h2>Energy Load in Texas from 2016-2023</h2>
 <p>According to the line graph from 2016 to 2023, the energy load is
 generally increasing overtime with great pattern of seasonality, and it
 has spiked in mid-2023. General trend will be explained later in time
@@ -1803,8 +1815,8 @@ month.
 </p>
 </div>
 </div>
-<div id="monthly-electricity-price-in-texas-from-2016-2023" class="section level3">
-<h3>Monthly electricity price in Texas from 2016-2023</h3>
+<div id="monthly-electricity-price-in-texas-from-2016-2023" class="section level2">
+<h2>Monthly electricity price in Texas from 2016-2023</h2>
 <p>The electricity price in Texas is increasing overtime from 2016-2023
 with slight but less consistent seasonality. However, the electricity
 price spike around early 2021, which could be a reflection from the
@@ -1823,9 +1835,9 @@ Fig.3 Avearged monthly electricity price (cent/kWh) from year 2016 to
 </div>
 <div id="analysis" class="section level1">
 <h1>Analysis</h1>
-<div id="question-1-how-did-local-energy-load-and-electricity-price-changed-in-2016-2023" class="section level3">
-<h3>Question 1: How did local energy load and electricity price changed
-in 2016-2023?</h3>
+<div id="question-1-how-did-local-energy-load-and-electricity-price-changed-in-2016-2023" class="section level2">
+<h2>Question 1: How did local energy load and electricity price changed
+in 2016-2023?</h2>
 <p>To find the trend of change in energy load and electricity price in
 2016-2023, we utilizes a time series analysis to eliminate the influence
 of strong seasonality and other noises in data. Here are the overall
@@ -1873,9 +1885,9 @@ has significantly increased in the past 8 years, with high score value
 and very low p-values. Detrended Mann Kendall test results show a much
 higher increasing tendency with very high possibility.</p>
 </div>
-<div id="question-2-how-does-the-frequency-of-extreme-cold-days-correlates-with-energy-load-and-electricity-price" class="section level3">
-<h3>Question 2: How does the frequency of extreme cold days correlates
-with energy load and electricity price?</h3>
+<div id="question-2-how-does-the-frequency-of-extreme-cold-days-correlates-with-energy-load-and-electricity-price" class="section level2">
+<h2>Question 2: How does the frequency of extreme cold days correlates
+with energy load and electricity price?</h2>
 <p>We used linear models analysis to find how frequency of extremely
 cold days impacts energy load and electricity price. The analysis shows
 if the frequency of extreme cold days impacts energy load and
@@ -1968,9 +1980,9 @@ is 0, the price will be 1.450e+00 cent, and for every one additional MW
 in energy load, the electricity price will increase by 7.772e-06 cent
 per MW.</p>
 </div>
-<div id="question-3-if-following-the-past-trend-how-much-energy-will-be-demanded-for-preparing-extreme-cold-days-in-2024-and-2025" class="section level3">
-<h3>Question 3: If following the past trend, how much energy will be
-demanded for preparing extreme cold days in 2024 and 2025?</h3>
+<div id="question-3-if-following-the-past-trend-how-much-energy-will-be-demanded-for-preparing-extreme-cold-days-in-2024-and-2025" class="section level2">
+<h2>Question 3: If following the past trend, how much energy will be
+demanded for preparing extreme cold days in 2024 and 2025?</h2>
 <p>Lastly, we hope to predict energy load in 2024 and 2025 based on
 historical data. We will use Autoregressive Integrated Moving Average
 (ARIMA) package to do a simple forecasting using historical energy load
@@ -1997,9 +2009,9 @@ Feburary and as low as 1013169.5 in December.</p>
 <p>Our analysis of extreme cold weather, energy demand and electricity
 pricing in Texas between 2016 and 2023 highlights several critical
 conclusions, corresponding to our three research questions proposed.</p>
-<div id="how-did-local-energy-load-and-electricity-price-changed-in-2016-2023" class="section level4">
-<h4>How did local energy load and electricity price changed in
-2016-2023?</h4>
+<div id="how-did-local-energy-load-and-electricity-price-changed-in-2016-2023" class="section level3">
+<h3>How did local energy load and electricity price changed in
+2016-2023?</h3>
 <p>Over the eight-year period, the energy load exhibited a clear
 increasing trend, coupled with strong seasonality. Average monthly
 electricity prices showed a general increasing trend over the years,
@@ -2009,9 +2021,9 @@ confirmed a statistically significant positive trend in energy load and
 electricity prices, with p-values indicating a high level of
 confidence.</p>
 </div>
-<div id="how-does-the-frequency-of-extreme-cold-days-correlates-with-energy-load-and-electricity-price-in-texas" class="section level4">
-<h4>How does the frequency of extreme cold days correlates with energy
-load and electricity price in Texas?</h4>
+<div id="how-does-the-frequency-of-extreme-cold-days-correlates-with-energy-load-and-electricity-price-in-texas" class="section level3">
+<h3>How does the frequency of extreme cold days correlates with energy
+load and electricity price in Texas?</h3>
 <p>The frequency of days with temperatures below freezing (&lt;0°C) was
 notably high during January 2021 and 2022, aligning with significant
 cold fronts that stressed the energy grid. Extreme cold events correlate
@@ -2030,9 +2042,9 @@ electricity prices. This suggests that pricing is more influenced by
 external factors such as supply constraints and policy
 interventions.</p>
 </div>
-<div id="if-following-the-past-trend-how-much-energy-will-be-demanded-for-preparing-extreme-cold-days-in-2024-and-2025" class="section level4">
-<h4>If following the past trend, how much energy will be demanded for
-preparing extreme cold days in 2024 and 2025?</h4>
+<div id="if-following-the-past-trend-how-much-energy-will-be-demanded-for-preparing-extreme-cold-days-in-2024-and-2025" class="section level3">
+<h3>If following the past trend, how much energy will be demanded for
+preparing extreme cold days in 2024 and 2025?</h3>
 <p>Based on the ARIMA test results, the predicted daily energy demand
 for normal winter days in Texas during December 2024 through February
 2025 ranges from 1,124,614 to 1,162,327 MW. However, with 95%
@@ -2047,8 +2059,8 @@ running smoothly throughout the winter.</p>
 </div>
 <div id="references" class="section level1">
 <h1>References</h1>
-<p>&lt;add references here if relevant, otherwise delete this
-section&gt;</p>
+<p>&lt;[1] NOAA’s National Weather Service. n.d. “Stay Safe in the
+Extreme Cold.” <a href="https://www.weather.gov/dlh/extremecold.\" class="uri">https://www.weather.gov/dlh/extremecold.\</a>&gt;</p>
 </div>
 
 
