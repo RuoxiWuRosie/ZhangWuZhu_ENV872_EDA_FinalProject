@@ -24,9 +24,9 @@ editor_options:
 ---
 
 \tableofcontents
-
+\newpage
 \listoftables
-
+\newpage
 \listoffigures
 
 ```{r setup, include=FALSE}
@@ -108,6 +108,7 @@ combined_data2$month_number <- format(combined_data2$month, "%m")
 winter_data <- subset(combined_data2, month_number %in% c("12", "01", "02"))
 ```
 
+\newpage
 # Rationale and Research Questions -- Background
 
 The 2021 Texas winter storm was a severe event that caused widespread power outages, major damage, and significant hardship for many people. With temperatures dropping as low as -2°F (-19°C), which was much lower than the defined "extreme cold" temperature 32.0°F (0°C) [1], the storm pushed the state’s energy systems beyond their capacity.The combination of extreme cold and infrastructure failures showed how unprepared the system was for such events. This highlights the need to better understand cold weather extremes and their impact on energy systems to reduce risks and improve reliability during future storms.
@@ -122,6 +123,7 @@ Our research focuses on studying how often extreme cold events happen in Texas a
 
 3.  If following the past trend, how much energy will be demanded for preparing extreme cold days in 2024 and 2025?
 
+\newpage
 # Dataset Information
 
 Data used for this analysis is from different sources. Historical records of temperature were found in the archive API <https://archive-api.open-meteo.com/v1/era5>. Given the information on Texas's latitude and longitude and the start and end dates from January 2016 to December 2023, the API archive could provide data on daily temperature in Texas from 2016 to 2023. The API gave the maximum and minimum temperatures in Texas from 2016 to 2023 in degrees Celsius. The Electric Reliability Council of Texas (ERCOT) gave hourly energy load data in Texas, from year 2016 to 2023, in MW. The U.S. Energy Information Administration (EIA) contained monthly average electricity price data from 2001 to 2024, and the unit was cent/kWh. The data for daily electricity prices was unavailable. All of the data from the three sources used in this analysis had a date column, which could ensure the time series analysis's viability. The data had continuous data on daily temperature, hourly load, and monthly price, which would be used for both time series and linear model analysis. The data and sources are listed below (Table 3.1).
@@ -134,6 +136,7 @@ Table 3.1: Table summarizing the data sources
 |   ERCOT | Texas Hourly Energy Load            |
 |     EIA | Texas Monthly Electricity Price     |
 
+\newpage
 # Data Wrangling
 
 The API data contained three columns: date, daily max temperature, and daily min temperature. The date column was in "character" format and thus needed to be converted to "date" format using the as.Date() code for the following analysis.
@@ -144,6 +147,7 @@ Finally, for electricity price, the EIA's data contains 8 variables, including t
 
 All the data's Date columns were converted to "date" format, and all other columns were converted to "numeric" format to make the latter analyses available. The raw data was uploaded to the "Data/Raw" file, and the processed datasets: monthly electricity price, daily energy load, monthly energy load, and daily temperature, were uploaded to the "Data/Processed" file in CSV format for the visualization, linear model analysis, and time series analysis. Please see DataWrangling.Rmd for details in preliminary data wrangling.l
 
+\newpage
 # Exploratory Analysis
 
 ## Extreme cold days in Texas from 2016-2023
@@ -179,6 +183,7 @@ ggplot(combined_data, aes(x = month, y = MW)) +
   mytheme
 ```
 
+\newpage
 ## Monthly electricity price in Texas from 2016-2023
 
 The electricity price in Texas is increasing overtime from 2016-2023 with slight but less consistent seasonality. However, the electricity price spike around early 2021, which could be a reflection from the large-scale blackout in the winter in Texas. The state-wide grid and local distribution systems were struggling to recover to cater the demand from the local residents and business during and right after the cold-front.
@@ -195,6 +200,7 @@ ggplot(combined_data, aes(x = month, y = Price)) +
 
 ```
 
+\newpage
 # Analysis
 
 ## Question 1: How did local energy load and electricity price changed in 2016-2023?
@@ -226,6 +232,8 @@ plot(energyload.daily.avg.decomp)
 
 ```
 
+\newpage
+ 
 ```{r include=FALSE}
 # Seasonal Mann Kendall test
 energyload.daily.trend <- Kendall::SeasonalMannKendall(energyload.daily.ts)
@@ -239,6 +247,7 @@ For electricity price, we also did time series analysis and seasonal Mann Kendal
 plot(electricity.monthly.decomp)
 ```
 
+\newpage
 ```{r include=FALSE}
 # Seasonal Mann Kendall Test
 electricity.monthly.trend <- Kendall::SeasonalMannKendall(electricity.monthly.ts)
@@ -270,6 +279,7 @@ print(results_table3)
 
 As shown in the table, both test results shows that electricity price has significantly increased in the past 8 years, with high score value and very low p-values. Detrended Mann Kendall test results show a much higher increasing tendency with very high possibility.
 
+\newpage
 ## Question 2: How does the frequency of extreme cold days correlates with energy load and electricity price?
 
 We used linear models analysis to find how frequency of extremely cold days impacts energy load and electricity price. The analysis shows if the frequency of extreme cold days impacts energy load and electricity price or not. The report first analyzed the cold day frequency and energy load.
@@ -346,6 +356,7 @@ print(results_table2)
 
 The p-value of energy load is 0.00922, which is smaller than the significance level 0.05, so we reject the null hypothesis that the average energy load in a month has no impacts on the monthly electricity price. There is strong evidence that the average energy load in a month has has a significant effect on electricity price. When the energy load is 0, the price will be 1.450e+00 cent, and for every one additional MW in energy load, the electricity price will increase by 7.772e-06 cent per MW.
 
+\newpage
 ## Question 3: If following the past trend, how much energy will be demanded for preparing extreme cold days in 2024 and 2025?
 
 Lastly, we hope to predict energy load in 2024 and 2025 based on historical data. We will use Autoregressive Integrated Moving Average (ARIMA) package to do a simple forecasting using historical energy load data from 2016 to 2023. However, daily energy load data will contain too much noise and excessive workload for the function to run; therefore, we choose to use averaged daily load of each months.
